@@ -10,14 +10,13 @@ None
 
 ## A rough list of features (this needs to be large enough to satisfy the "scope" requirements)
 
-The agent will be able to organize games, based on filters
-
-The agent will be able to see which games are installed or uninstalled and pull for all games or just installed 
-
-The agent will be able to update website when user gets an achievement
-
 The agent will be able to pull up videos for achivements to show the user how to get them.
 
+The agent will be able to detect events in games and notify user of the event.
+
+The agent will be able to track time on game and turn on alarm to notify user when they reach a set time( User sets the time )
+
+The agent will be able to give a random list of achievements to the user for a game they specify, so it makes it more fun. 
 
 ## A list of new things you will need to do to accomplish your project (e.g. websockets)
 
@@ -28,12 +27,25 @@ Will need to learn how to keep the AI running in background to interactivly mark
 
 
 ## Pages/ Views
+Add more pages
 
 Each game achivements will be displayed on one template page but there will be tabs to switch between games. If organized in a section the sections games will be in the tabs layout to navigate between games.
 
 Have all the games organized on a main page.
 
+## Features
 
+Organize games, based on filters
+
+Data syncronization
+
+Timer
+
+Notifications
+
+## Proof of concept
+
+The agent will be able to pull up videos for achivements to show the user how to get them.
 
 ## Optional Feature
 
@@ -46,12 +58,16 @@ If an open world game that requires collectibles, Agent can pull up interactive 
 #### Estimates:
 
 Rubric items:
-- item 1 with description
-- item 2 with description
+- CI/CD Pipeline: Set up CI/CD Pipeline to auto run linting and the kubernetes
+- Setup kubernetes files to have a live production enviornment
+- Error handling
+- Tests run in pipeline aborts if they fail
 
 Features:
-- feature 4 with description
-- feature 5 with description
+- Barebones react/typescript webpage
+- Button to test errors
+- barebone tests to see if they run in pipeline and if aborts on fail
+
 
 #### Delivered
 
@@ -65,8 +81,8 @@ Features:
 #### Estimates:
 
 Rubric items:
-- item 1 with description
-- item 2 with description
+- 
+- 
 
 Features:
 - feature 4 with description
