@@ -47,6 +47,8 @@ Notifications
 
 The agent will be able to pull up videos for achivements to show the user how to get them.
 
+Had help with AI to even see if it was possible. Gave me ways to pull up youtube video results and the first result. I'm thinking this could be loaded in a component for the user.
+
 ## Optional Feature
 
 If an open world game that requires collectibles, Agent can pull up interactive map that auto syncs your game with it every 10 seconds to keep it up on current info. 
