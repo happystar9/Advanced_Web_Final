@@ -27,11 +27,22 @@ Will need to learn how to keep the AI running in background to interactivly mark
 
 
 ## Pages/ Views
-Add more pages
 
 Each game achivements will be displayed on one template page but there will be tabs to switch between games. If organized in a section the sections games will be in the tabs layout to navigate between games.
 
 Have all the games organized on a main page.
+
+Page where you can save Youtube videos for the achievements you want to go for.
+
+Page for todo achivements list
+
+Page that shows the achivement with its description and the youtube videos pulled from the api
+
+Home page describing the website.
+
+Settings page
+
+Confirm popups
 
 ## Features
 
@@ -42,6 +53,12 @@ Data syncronization
 Timer
 
 Notifications
+
+Video Recommendation
+
+Save Videos
+
+Save achivements list
 
 ## Proof of concept
 
