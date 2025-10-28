@@ -77,15 +77,15 @@ If an open world game that requires collectibles, Agent can pull up interactive 
 #### Estimates:
 
 Rubric items:
-- CI/CD Pipeline: Set up CI/CD Pipeline to auto run linting and the kubernetes
-- Setup kubernetes files to have a live production enviornment
-- Error handling
-- Tests run in pipeline aborts if they fail
+- [ ] CI/CD Pipeline: Set up CI/CD Pipeline to auto run linting and the kubernetes
+- [ ] Setup kubernetes files to have a live production enviornment
+- [ ] Error handling
+- [ ] Tests run in pipeline aborts if they fail
 
 Features:
-- Barebones react/typescript webpage
-- Button to test errors
-- barebone tests to see if they run in pipeline and if aborts on fail
+- [ ] Barebones react/typescript webpage
+- [ ] Button to test errors
+- [ ] barebone tests to see if they run in pipeline and if aborts on fail
 
 
 #### Delivered
@@ -100,12 +100,12 @@ Features:
 #### Estimates:
 
 Rubric items:
-- Tanstack query
-- Toasts
+- [ ] Tanstack query
+- [ ] Toasts
 
 Features:
-- Toast popups for errors and notifications
-- Setup tanstack query for api calls 
+- [ ] Toast popups for errors and notifications
+- [ ] Setup tanstack query for api calls 
 
 #### Delivered
 
@@ -119,14 +119,14 @@ Features:
 #### Estimates:
 
 Rubric items:
-- Authentication and user account support
-- Authorized pages and public pages
-- 3 views/pages
+- [ ] Authentication and user account support
+- [ ] Authorized pages and public pages
+- [ ] 3 views/pages
 
 Features:
-- Settings page 
-- Home page Unauthorized
-- Games list page Authorized
+- [ ] Settings page 
+- [ ] Home page Unauthorized
+- [ ] Games list page Authorized
 
 #### Delivered
 
@@ -140,11 +140,11 @@ Features:
 #### Estimates:
 
 Rubric items:
-- 2 views/pages
+- [ ] 2 views/pages
 
 Features:
-- Todo achivements list page
-- Saved YouTube videos Page
+- [ ] Todo achivements list page
+- [ ] Saved YouTube videos Page
 
 #### Delivered
 
@@ -158,11 +158,11 @@ Features:
 #### Estimates:
 
 Rubric items:
-- Pages/Views
+- [ ] Pages/Views
 
 Features:
-- Confirm Popups
-- Individual achivement page
+- [ ] Confirm Popups
+- [ ] Individual achivement page
 
 #### Delivered
 
