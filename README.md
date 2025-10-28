@@ -10,7 +10,7 @@ None
 
 ## A rough list of features (this needs to be large enough to satisfy the "scope" requirements)
 
-The agent will be able to pull up videos for achivements to show the user how to get them.
+The agent will be able to pull up videos for achivements to show the user how to get them. (Feed 5-10 videos/ descriptions, have it choose the most relevent. Display 3 most important to users)
 
 The agent will be able to detect events in games and notify user of the event.
 
