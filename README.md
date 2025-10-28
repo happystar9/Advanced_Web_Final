@@ -100,12 +100,12 @@ Features:
 #### Estimates:
 
 Rubric items:
-- 
-- 
+- Tanstack query
+- Toasts
 
 Features:
-- feature 4 with description
-- feature 5 with description
+- Toast popups for errors and notifications
+- Setup tanstack query for api calls 
 
 #### Delivered
 
@@ -119,12 +119,14 @@ Features:
 #### Estimates:
 
 Rubric items:
-- item 1 with description
-- item 2 with description
+- Authentication and user account support
+- Authorized pages and public pages
+- 3 views/pages
 
 Features:
-- feature 4 with description
-- feature 5 with description
+- Settings page 
+- Home page Unauthorized
+- Games list page Authorized
 
 #### Delivered
 
@@ -138,12 +140,11 @@ Features:
 #### Estimates:
 
 Rubric items:
-- item 1 with description
-- item 2 with description
+- 2 views/pages
 
 Features:
-- feature 4 with description
-- feature 5 with description
+- Todo achivements list page
+- Saved YouTube videos Page
 
 #### Delivered
 
@@ -157,12 +158,11 @@ Features:
 #### Estimates:
 
 Rubric items:
-- item 1 with description
-- item 2 with description
+- Pages/Views
 
 Features:
-- feature 4 with description
-- feature 5 with description
+- Confirm Popups
+- Individual achivement page
 
 #### Delivered
 
