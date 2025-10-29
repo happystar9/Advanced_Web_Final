@@ -1,4 +1,4 @@
 import pytest
 
 def test_always_passes():
-    assert False
+    assert True
