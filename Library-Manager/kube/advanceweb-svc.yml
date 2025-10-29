@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-svc
+  namespace: ricardo-advancedweb
+spec:
+  selector:
+    app: web-svc
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 50
+  type: ClusterIP

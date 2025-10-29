@@ -1,0 +1,23 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      DB_CONN: "Host=db;Port=5432;Database=mydatabase;Username=myuser;Password=mypassword"
+    restart: always
+
+  db:
+    image: postgres
+    volumes: 
+     #  /var/lib/postgres/data
+      - ./schema.sql:/docker-entrypoint-schemadb.d/schema.sql
+    environment:
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_USER=ricardo
+      - POSTGRES_DB=ricardodb
+
+volumes:
+  PGDATA:

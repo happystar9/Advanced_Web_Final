@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ricardo-web-schema-sql
+  namespace: ricardo-advancedweb
+data:
+  db-schema.sql: |
+    CREATE TABLE IF NOT EXISTS games (
+      id SERIAL PRIMARY KEY,
+      slug TEXT UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT,
+      release_date DATE,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+    );
+
+    CREATE TABLE IF NOT EXISTS achievements (
+      id SERIAL PRIMARY KEY,
+      game_id INTEGER NOT NULL REFERENCES games(id) ON DELETE CASCADE,
+      key TEXT NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT,
+      points INTEGER NOT NULL DEFAULT 0 CHECK (points >= 0),
+      hidden BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+      UNIQUE (game_id, key)
+    );
+
+    INSERT INTO games (slug, name, description, release_date) VALUES
+      ('space-invaders-2025', 'Space Invaders 2025', 'A retro space shooter remade.', '2025-10-01')
+    ON CONFLICT (slug) DO NOTHING;
+
+    INSERT INTO achievements (game_id, key, name, description, points, hidden)
+    SELECT g.id, 'first-kill', 'First Kill', 'Destroy your first enemy', 10, false FROM games g WHERE g.slug='space-invaders-2025'
+    ON CONFLICT (game_id,key) DO NOTHING;
+
+    INSERT INTO achievements (game_id, key, name, description, points, hidden)
+    SELECT g.id, 'secret-boss', 'Secret Boss Defeated', 'Defeat the hidden boss', 100, true FROM games g WHERE g.slug='space-invaders-2025'
+    ON CONFLICT (game_id,key) DO NOTHING;

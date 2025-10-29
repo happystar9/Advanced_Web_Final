@@ -1,0 +1,34 @@
+name: log to the console
+on:
+- push
+- workflow_dispatch
+jobs:
+  log_to_console:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: test
+      run: |
+        docker build -f ./test.Dockerfile -t ricardo_test_container .
+        docker run --rm ricardo_test_container
+
+    - name: build and push to docker hub
+      run: |
+        docker build -t happystar91/advanced-web-final-kubernetes:${{github.run_number}} .
+        docker push happystar91/advanced-web-final-kubernetes:${{github.run_number}}
+    
+    - name: deploy to kubernetes
+      run: |
+        export BUILD_NUMBER=${{github.run_number}}
+
+        for FILE in "kube"/*
+        do
+          cat "$FILE" | envsubst | kubectl apply -f -
+        done

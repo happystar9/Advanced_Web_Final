@@ -1,0 +1,17 @@
+apiVersion: networking.k9s.io/v1
+kind: Ingress
+metadata:
+  name: ricardo-advanceweb-ingress
+  namespace: ricardo-advancedweb
+spec:
+  rules:
+  - host: ricardoruiz.duckdns.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-svc
+            port:
+              number: 80

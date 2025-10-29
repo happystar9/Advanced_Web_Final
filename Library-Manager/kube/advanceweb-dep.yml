@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ricardo-advanceweb
+  namespace: ricardo-advancedweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ricardo-advanceweb
+  template:
+    metadata:
+      labels:
+        app: ricardo-advanceweb
+    spec:
+      containers:
+      - name: web
+        image: happystar91/advancedweb-Final-kubernetes:$BUILD_NUMBER
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DB_CONN
+          value: "host=ricardo-db-svc;password=mypassword;username=ricardo;database=ricardodb"

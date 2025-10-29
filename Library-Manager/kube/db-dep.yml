@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ricardo-advanceweb-db-dep
+  namespace: ricardo-advancedweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ricardo-advanceweb-db
+  template:
+    metadata:
+      labels:
+        app: ricardo-advanceweb-db
+    spec:
+      volumes:
+      # - name: my-db-data
+      #   persistentVolumeClaim:
+      #     claimName: ricardo-advanceweb-db-pvc
+      - name: schema-init
+        configMap:
+          name: ricardo-advanceweb-schema-sql
+      containers:
+      - name: db
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: my-db-data
+        - mountPath: /docker-entrypoint-schemadb.d/schema.sql
+          subPath: db-schema.sql
+          name: schema-init
+        image: postgres:16
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          value: mypassword
+        - name: POSTGRES_USER
+          value: ricardo
+        - name: POSTGRES_DB
+          value: ricardodb
