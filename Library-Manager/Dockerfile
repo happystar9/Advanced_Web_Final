@@ -3,12 +3,13 @@ WORKDIR /app
 
 RUN apk add --no-cache python3 make g++ || true
 
-COPY package.json package-lock.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
 COPY . .
 
-RUN npm install --silent
-RUN npm run build
+RUN npm install -g pnpm --silent \
+	&& pnpm install --frozen-lockfile --silent \
+	&& pnpm run build
 
 FROM nginx:stable-alpine
 
