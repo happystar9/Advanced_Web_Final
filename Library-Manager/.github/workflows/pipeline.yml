@@ -1,11 +1,8 @@
-name: log to the console
-on:
-jobs:
-name: log to the console
+name: pipeline
 
 on:
-  - push
-  - workflow_dispatch
+  push:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -19,7 +16,6 @@ jobs:
           docker build -f ./test.Dockerfile -t ricardo_test_container .
 
       - name: Run tests inside container
-        # if the container exits non-zero, this step (and job) will fail and the workflow will stop
         run: |
           docker run --rm ricardo_test_container
 
