@@ -34,7 +34,6 @@ jobs:
 
       - name: build and push to docker hub
         run: |
-          # Build from Library-Manager directory where the project's Dockerfile(s) reside
           docker build -t happystar91/advanced-web-final-kubernetes:${{github.run_number}} ./Library-Manager
           docker push happystar91/advanced-web-final-kubernetes:${{github.run_number}}
 
