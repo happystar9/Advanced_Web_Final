@@ -4,6 +4,7 @@ metadata:
   name: ricardo-advanceweb-ingress
   namespace: ricardo-advancedweb
 spec:
+  ingressClassName: nginx
   rules:
   - host: advanceweb.duckdns.org
     http:
