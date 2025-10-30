@@ -77,9 +77,9 @@ If an open world game that requires collectibles, Agent can pull up interactive 
 #### Estimates:
 
 Rubric items:
-- [ ] CI/CD Pipeline: Set up CI/CD Pipeline to auto run linting and the kubernetes
-- [ ] Setup kubernetes files to have a live production enviornment
-- [ ] Tests run in pipeline aborts if they fail
+- [x] CI/CD Pipeline: Set up CI/CD Pipeline to auto run linting and the kubernetes
+- [ ] Setup kubernetes files to have a live production enviornment (Kube not pulling webpage)
+- [x] Tests run in pipeline aborts if they fail
 
 Features:
 - [x] Barebones react/typescript webpage
@@ -89,9 +89,11 @@ Features:
 #### Delivered
 
 Rubric Items:
-
-
+- [x] CI/CD Pipeline: Set up CI/CD Pipeline to auto run linting and the kubernetes
+- [x] Tests run in pipeline aborts if they fail
 Features:
+- [x] Barebones react/typescript webpage
+- [x] barebone tests to see if they run in pipeline and if aborts on fail
 
 ### Nov 1
 
