@@ -40,11 +40,24 @@ jobs:
       - name: deploy to kubernetes
         shell: pwsh
         run: |
-          # Use PowerShell for Windows self-hosted runner
           $env:BUILD_NUMBER = "${{ github.run_number }}"
 
-          # For each file in the kube directory, replace ${BUILD_NUMBER} with the build number and apply
-          Get-ChildItem -Path kube -File | ForEach-Object {
+          $workspace = $env:GITHUB_WORKSPACE
+          Write-Host "GITHUB_WORKSPACE=${workspace}"
+          $kubePath = Join-Path $workspace 'kube'
+          if (-not (Test-Path $kubePath)) {
+            $kubePath = Join-Path (Get-Location) 'kube'
+          }
+
+          Write-Host "Attempting to use kube path: $kubePath"
+          if (-not (Test-Path $kubePath)) {
+            Write-Host "ERROR: kube directory not found at '$kubePath' or workspace. Listing current directory:"; Get-ChildItem -Force | Write-Host
+            throw "kube directory not found. Aborting deploy step."
+          }
+
+          Write-Host "Listing kube directory contents:"; Get-ChildItem -Path $kubePath -File | ForEach-Object { Write-Host $_.FullName }
+
+          Get-ChildItem -Path $kubePath -File | ForEach-Object {
             $content = Get-Content -Raw $_.FullName
             $content = $content -replace '\$\{BUILD_NUMBER\}', $env:BUILD_NUMBER
             $content | kubectl apply -f -
