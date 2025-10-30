@@ -38,10 +38,14 @@ jobs:
           docker push happystar91/advanced-web-final-kubernetes:${{github.run_number}}
 
       - name: deploy to kubernetes
+        shell: pwsh
         run: |
-          export BUILD_NUMBER=${{github.run_number}}
+          # Use PowerShell for Windows self-hosted runner
+          $env:BUILD_NUMBER = "${{ github.run_number }}"
 
-          for FILE in "kube"/*
-          do
-            cat "$FILE" | envsubst | kubectl apply -f -
-          done
+          # For each file in the kube directory, replace ${BUILD_NUMBER} with the build number and apply
+          Get-ChildItem -Path kube -File | ForEach-Object {
+            $content = Get-Content -Raw $_.FullName
+            $content = $content -replace '\$\{BUILD_NUMBER\}', $env:BUILD_NUMBER
+            $content | kubectl apply -f -
+          }
