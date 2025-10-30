@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ricardo-web-schema-sql
+  name: ricardo-advanceweb-schema-sql
   namespace: ricardo-advancedweb
 data:
   db-schema.sql: |

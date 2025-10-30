@@ -5,7 +5,7 @@ metadata:
   namespace: ricardo-advancedweb
 spec:
   selector:
-    app: web-svc
+    app: ricardo-advanceweb
   ports:
     - protocol: TCP
       port: 80
