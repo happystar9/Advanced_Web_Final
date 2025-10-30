@@ -14,9 +14,9 @@ spec:
         app: ricardo-advanceweb-db
     spec:
       volumes:
-      # - name: my-db-data
-      #   persistentVolumeClaim:
-      #     claimName: ricardo-advanceweb-db-pvc
+      - name: my-db-data
+        persistentVolumeClaim:
+          claimName: ricardo-advanceweb-db-pvc
       - name: schema-init
         configMap:
           name: ricardo-advanceweb-schema-sql

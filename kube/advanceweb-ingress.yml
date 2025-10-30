@@ -5,7 +5,7 @@ metadata:
   namespace: ricardo-advancedweb
 spec:
   rules:
-  - host: ricardoruiz.duckdns.org
+  - host: advanceweb.duckdns.org
     http:
       paths:
       - path: /
