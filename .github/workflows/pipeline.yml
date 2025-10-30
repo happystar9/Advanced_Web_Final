@@ -44,14 +44,21 @@ jobs:
 
           $workspace = $env:GITHUB_WORKSPACE
           Write-Host "GITHUB_WORKSPACE=${workspace}"
-          $kubePath = Join-Path $workspace 'kube'
-          if (-not (Test-Path $kubePath)) {
-            $kubePath = Join-Path (Get-Location) 'kube'
+          $candidates = @(
+            Join-Path $workspace 'kube',
+            Join-Path $workspace 'Library-Manager\kube',
+            Join-Path (Get-Location) 'kube'
+          )
+
+          $kubePath = $null
+          foreach ($cand in $candidates) {
+            if (Test-Path $cand) { $kubePath = $cand; break }
           }
 
           Write-Host "Attempting to use kube path: $kubePath"
-          if (-not (Test-Path $kubePath)) {
-            Write-Host "ERROR: kube directory not found at '$kubePath' or workspace. Listing current directory:"; Get-ChildItem -Force | Write-Host
+          if (-not $kubePath) {
+            Write-Host "ERROR: kube directory not found in any of the candidate locations:"; $candidates | ForEach-Object { Write-Host "  $_" }
+            Write-Host "Listing current directory:"; Get-ChildItem -Force | ForEach-Object { Write-Host "  $_" }
             throw "kube directory not found. Aborting deploy step."
           }
 
