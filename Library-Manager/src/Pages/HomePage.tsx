@@ -2,6 +2,7 @@ import { useState } from 'react'
 import reactLogo from '../assets/react.svg'
 import { toast, Toaster } from 'react-hot-toast'
 import '../App.css'
+import NavBar from '../components/NavBar'
 
 const viteLogo = '/vite.svg'
 
@@ -11,6 +12,7 @@ function Home() {
   return (
     <>
       <div>
+        <NavBar />
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>
@@ -36,7 +38,6 @@ function Home() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
-      {/* ensure toasts are rendered somewhere in the page */}
       <Toaster />
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more

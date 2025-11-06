@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap");
+@import "tailwindcss";
+
+.navbar-header {
+    @apply fixed;
+    @apply top-0;
+    @apply left-0;
+    @apply right-0;
+    @apply w-full;
+    @apply bg-[hsl(0,4%,26%)];
+    @apply flex;
+    @apply items-center;
+    @apply py-4;
+    @apply px-8;
+    @apply z-1000;
+    @apply shadow-md;
+}
+
+.navbar-container {
+    @apply flex;
+    @apply items-center;
+    @apply justify-end;
+    @apply w-full;
+    @apply max-w-7xl;
+    @apply m-auto;
+}
+
+.navbar-nav {
+    @apply flex;
+    @apply items-center;
+    @apply ml-auto;
+    gap: 1rem;
+}
+
+.nav-button {
+  @apply text-[#DCAF56];
+  @apply rounded-lg;
+  @apply w-[100px];
+  @apply h-[40px];
+  @apply h-[40px];
+  @apply px-4;
+  padding-bottom: 4px;
+  padding-bottom: 4px;
+  @apply hover:bg-[#6C5019];
+  @apply duration-200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  text-decoration: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  text-decoration: none;
+  font-family: "Newsreader", serif;
+}
