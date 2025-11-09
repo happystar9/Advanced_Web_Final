@@ -39,6 +39,7 @@ jobs:
 
       - name: deploy to kubernetes
         run: |
+          export KUBECONFIG=$HOME/.kube/config
           export BUILD_NUMBER=${{github.run_number}}
 
           for FILE in "kube"/*
