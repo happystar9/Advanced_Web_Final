@@ -156,18 +156,21 @@ Features:
 #### Estimates:
 
 Rubric items:
-- [ ] 2 views/pages
+- [x] 2 views/pages
 
 Features:
-- [ ] Todo achivements list page
-- [ ] Saved YouTube videos Page
+- [x] Todo achivements list page
+- [x] Saved YouTube videos Page
 
 #### Delivered
 
-Rubric Items:
-
+Rubric items:
+- [x] 2 views/pages
 
 Features:
+- [x] Todo achivements list page
+- [x] Saved YouTube videos Page
+
 
 ### Nov 12
 
