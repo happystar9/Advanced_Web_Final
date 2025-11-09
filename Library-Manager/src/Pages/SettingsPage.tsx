@@ -1,6 +1,6 @@
 import NavBar from "../components/NavBar"
 
-export default function SettingsPage() {
+function SettingsPage() {
   return (
     <div>
       <NavBar />
@@ -9,3 +9,5 @@ export default function SettingsPage() {
     </div>
   )
 }
+
+export default SettingsPage

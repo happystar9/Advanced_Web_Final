@@ -6,6 +6,8 @@ import Home from './Pages/HomePage'
 import LoginPage from './Pages/LoginPage'
 import SettingsPage from './Pages/SettingsPage'
 import GamesListPage from './Pages/GamesListPage'
+import SavedVideos from './Pages/SavedVideosPage'
+import Todo from './Pages/TodoPage'
 import ProtectedRoute from './ProtectedRoute'
 import './index.css'
 
@@ -29,6 +31,22 @@ createRoot(document.getElementById('root')!).render(
             <Route index element={<LoginPage />} />
             <Route path="/Home" element={<Home />} />
             <Route path="/settings" element={<SettingsPage />} />
+              <Route
+                path="/saved-videos"
+                element={
+                  <ProtectedRoute>
+                    <SavedVideos />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/todo"
+                element={
+                  <ProtectedRoute>
+                    <Todo />
+                  </ProtectedRoute>
+                }
+              />
             <Route
               path="/games"
               element={

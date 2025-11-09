@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from 'react-oidc-context'
 import '../styles/NavBar.css'
 
-export default function NavBar() {
+function NavBar() {
     const auth = useAuth()
     const navigate = useNavigate()
 
@@ -38,6 +38,12 @@ export default function NavBar() {
                             <Link to="/games" style={{ marginRight: 12 }}>
                                 Games
                             </Link>
+                            <Link to="/saved-videos" style={{ marginRight: 12 }}>
+                                Saved Videos
+                            </Link>
+                            <Link to="/todo" style={{ marginRight: 12 }}>
+                                Todo
+                            </Link>
                             <a href="#" onClick={handleSignOut} style={{ color: 'blue' }}>
                                 Logout
                             </a>
@@ -52,3 +58,5 @@ export default function NavBar() {
         </div>
     )
 }
+
+export default NavBar
