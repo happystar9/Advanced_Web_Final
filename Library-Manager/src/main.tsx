@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 import { AuthProvider } from 'react-oidc-context'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './Pages/HomePage'
-import LoginPage from './Pages/LoginPage'
 import SettingsPage from './Pages/SettingsPage'
 import GamesListPage from './Pages/GamesListPage'
 import SavedVideos from './Pages/SavedVideosPage'
@@ -28,8 +27,7 @@ createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Routes>
-            <Route index element={<LoginPage />} />
-            <Route path="/Home" element={<Home />} />
+            <Route index path="/Home" element={<Home />} />
             <Route path="/settings" element={<SettingsPage />} />
               <Route
                 path="/saved-videos"

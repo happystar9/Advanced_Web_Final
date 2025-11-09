@@ -1,27 +1,12 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAuth } from 'react-oidc-context'
+import useAuthActions from '../hooks/useAuthActions'
 import '../styles/NavBar.css'
 
 function NavBar() {
     const auth = useAuth()
-    const navigate = useNavigate()
 
-    const handleSignOut = (e: React.MouseEvent) => {
-        e.preventDefault()
-        auth.removeUser()
-        try {
-            sessionStorage.clear()
-        } catch (err) {
-            console.debug('sessionStorage clear failed', err)
-        }
-        navigate('/')
-    }
-
-    const handleSignIn = (e: React.MouseEvent) => {
-        e.preventDefault()
-        auth.signinRedirect()
-    }
+    const { signIn, signOut } = useAuthActions()
 
     return (
         <div className='navbar-header'>
@@ -44,12 +29,24 @@ function NavBar() {
                             <Link to="/todo" style={{ marginRight: 12 }}>
                                 Todo
                             </Link>
-                            <a href="#" onClick={handleSignOut} style={{ color: 'blue' }}>
+                            <a
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    signOut()
+                                }}
+                            >
                                 Logout
                             </a>
                         </>
                     ) : (
-                        <a href="#" onClick={handleSignIn}>
+                        <a
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault()
+                                signIn()
+                            }}
+                        >
                             Sign In
                         </a>
                     )}
