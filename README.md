@@ -100,42 +100,56 @@ Features:
 #### Estimates:
 
 Rubric items:
-- [ ] Tanstack query
-- [ ] Toasts
-- [ ] Error handling
+- [x] Keycloak Authentification
+- [x] Toasts
+- [x] Error handling
 
 Features:
-- [ ] Toast popups for errors and notifications
-- [ ] Setup tanstack query for api calls
-- [ ] Button to test errors 
+- [x] Login page startup
+- [x] Toast popups for errors and notifications
+- [x] Button to test errors 
 
 #### Delivered
 
 Rubric Items:
-
+- [x] Keycloak Authentification
+- [x] Toasts
+- [x] Error handling
 
 Features:
+- [x] Login page startup
+- [x] Toast popups for errors and notifications
+- [x] Button to test errors 
 
 ### Nov 5
 
 #### Estimates:
 
 Rubric items:
-- [ ] Authentication and user account support
-- [ ] Authorized pages and public pages
-- [ ] 3 views/pages
+- [x] Authentication and user account support
+- [x] Authorized pages and public pages
+- [x] Tanstack query
+- [x] 3 views/pages
 
 Features:
-- [ ] Settings page 
-- [ ] Home page Unauthorized
-- [ ] Games list page Authorized
+- [x] Settings page 
+- [x] Home page Unauthorized
+- [x] Games list page Authorized
+- [x] Setup tanstack query for api calls
 
 #### Delivered
 
-Rubric Items:
-
+Rubric items:
+- [x] Authentication and user account support
+- [x] Authorized pages and public pages
+- [x] Tanstack query
+- [x] 3 views/pages
 
 Features:
+- [x] Settings page 
+- [x] Home page Unauthorized
+- [x] Games list page Authorized
+- [x] Setup tanstack query for api calls
 
 ### Nov 8
 
