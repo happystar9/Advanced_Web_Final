@@ -1,0 +1,8 @@
+# Node modules
+node_modules/
+
+# Server env
+Library-Manager/server/.env
+
+# Frontend env
+Library-Manager/.env
