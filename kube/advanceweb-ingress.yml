@@ -9,7 +9,7 @@ spec:
   - host: advanceweb.duckdns.org
     http:
       paths:
-      - path: /home
+      - path: /Home
         pathType: Prefix
         backend:
           service:
