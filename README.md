@@ -197,7 +197,7 @@ Features:
 #### Estimates:
 
 Rubric items:
-- item 1 with description
+- [ ] d
 - item 2 with description
 
 Features:
