@@ -9,7 +9,21 @@ spec:
   - host: advanceweb.duckdns.org
     http:
       paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: web-svc
+            port:
+              number: 80
       - path: /Home
+        pathType: Prefix
+        backend:
+          service:
+            name: web-svc
+            port:
+              number: 80
+      - path: /
         pathType: Prefix
         backend:
           service:
