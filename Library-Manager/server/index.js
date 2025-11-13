@@ -163,3 +163,29 @@ app.get('/', (req, res) => res.json({ status: 'ok', msg: 'steam-proxy running' }
 app.listen(PORT, () => {
   console.log(`Steam proxy listening on http://localhost:${PORT}`)
 })
+
+// YouTube search proxy: server-side request using YT_API_KEY so client never sees the key
+app.get('/api/youtube/search', async (req, res) => {
+  try {
+    const q = String(req.query.q || '')
+    const max = Number(req.query.maxResults || req.query.max || 10) || 10
+    const key = process.env.YT_API_KEY
+    if (!key) return res.status(500).json({ error: 'YT_API_KEY not configured on server' })
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=${encodeURIComponent(
+      String(max),
+    )}&q=${encodeURIComponent(q)}&key=${encodeURIComponent(key)}`
+    const r = await fetch(url)
+    const json = await r.json()
+    // Normalize items to a compact array
+    const items = (json.items || []).map((it) => ({
+      videoId: it.id?.videoId,
+      title: it.snippet?.title,
+      channelTitle: it.snippet?.channelTitle,
+      description: it.snippet?.description,
+      thumbnails: it.snippet?.thumbnails,
+    }))
+    res.json({ items })
+  } catch (err) {
+    res.status(500).json({ error: String(err) })
+  }
+})

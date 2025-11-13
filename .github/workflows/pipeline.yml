@@ -11,6 +11,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create .env files from GitHub Secrets
+        run: |
+          mkdir -p Library-Manager/server
+          cat > Library-Manager/server/.env <<'EOF'
+          STEAM_API_KEY=${{ secrets.STEAM_API_KEY }}
+          STEAM_OWNER_STEAMID=${{ secrets.STEAM_OWNER_STEAMID }}
+          STEAM_OWNER_VANITY=${{ secrets.STEAM_OWNER_VANITY }}
+          STEAM_HIDDEN_APPIDS=${{ secrets.STEAM_HIDDEN_APPIDS }}
+          PORT=3001
+          EOF
+
+          cat > .env <<'EOF'
+          YT_API_KEY=${{ secrets.YT_API_KEY }}
+          VITE_STEAM_PROXY_URL=http://localhost:3001
+          EOF
+        shell: bash
+
       - name: Build test image
         run: |
           docker build -f ./Library-Manager/test.Dockerfile -t ricardo_test_container ./Library-Manager
@@ -41,6 +58,16 @@ jobs:
         run: |
           export KUBECONFIG=$HOME/.kube/config
           export BUILD_NUMBER=${{github.run_number}}
+
+          kubectl create namespace ricardo-advancedweb || true
+
+          kubectl create secret generic app-secrets \
+            --from-literal=STEAM_API_KEY="${{ secrets.STEAM_API_KEY }}" \
+            --from-literal=STEAM_OWNER_STEAMID="${{ secrets.STEAM_OWNER_STEAMID }}" \
+            --from-literal=STEAM_OWNER_VANITY="${{ secrets.STEAM_OWNER_VANITY }}" \
+            --from-literal=STEAM_HIDDEN_APPIDS="${{ secrets.STEAM_HIDDEN_APPIDS }}" \
+            --from-literal=YT_API_KEY="${{ secrets.YT_API_KEY }}" \
+            --dry-run=client -o yaml | kubectl -n ricardo-advancedweb apply -f -
 
           for FILE in "kube"/*
           do

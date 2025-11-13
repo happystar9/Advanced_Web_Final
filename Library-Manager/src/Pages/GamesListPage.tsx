@@ -1,52 +1,13 @@
 import { useAuth } from 'react-oidc-context'
 import NavBar from '../components/NavBar'
-import { fetchOwnedGames, fetchOwnerSteamId } from '../hooks/useSteam'
-import { useState, useEffect } from 'react'
-
-type Game = {
-  appid: number
-  name?: string
-  playtime_forever?: number
-}
+import useOwnerGames from '../hooks/useOwnerGames'
+import type { OwnerGame as Game } from '../hooks/useOwnerGames'
 
 export default function GamesListPage() {
   const auth = useAuth()
   const username = auth.user?.profile?.preferred_username || auth.user?.profile?.name || 'user'
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [games, setGames] = useState<Game[]>([])
-
-  // Auto-load the owner steamid from the server proxy and fetch owned games
-  useEffect(() => {
-    let mounted = true
-    async function loadOwnerGames() {
-      setError(null)
-      setLoading(true)
-      if (mounted) setGames([])
-      try {
-        const ownerId = await fetchOwnerSteamId()
-        if (!ownerId) throw new Error('Owner SteamID not available')
-        const res = await fetchOwnedGames(ownerId, { include_appinfo: true, include_played_free_games: true })
-        const json = res as Record<string, unknown>
-        const response = (json['response'] as Record<string, unknown> | undefined) || undefined
-        const list = response && Array.isArray(response['games']) ? (response['games'] as unknown[]) : []
-        if (mounted) setGames(list as Game[])
-      } catch (err: unknown) {
-        if (mounted) setError(err instanceof Error ? err.message : String(err))
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    if (auth?.isAuthenticated) {
-      loadOwnerGames()
-    }
-
-    return () => {
-      mounted = false
-    }
-  }, [auth?.isAuthenticated])
+  const { games, loading, error } = useOwnerGames(!!auth?.isAuthenticated)
 
   return (
     <div>
@@ -60,7 +21,7 @@ export default function GamesListPage() {
             <p className="mb-4">This page is protected and only visible to authenticated users.</p>
 
             <div className="mb-4">
-              <p className="text-sm mb-1">Showing games for the Steam account attached to the server API key.</p>
+              <p className="text-sm mb-1">Showing games for the Steam account.</p>
               {error && <p className="text-red-400 mt-2">{error}</p>}
             </div>
 

@@ -177,18 +177,20 @@ Features:
 #### Estimates:
 
 Rubric items:
-- [ ] Pages/Views
+- [x] Network Calls that read and write data
 
 Features:
-- [ ] Confirm Popups
-- [ ] Individual achivement page
+- [x] Connection to Steam api that pulls the games of user and displays on frontend
+- [x] Connection to Youtube api that pulls videos of achievements and displays on frontend
 
 #### Delivered
 
-Rubric Items:
-
+Rubric items:
+- [x] Network Calls that read and write data
 
 Features:
+- [x] Connection to Steam api that pulls the games of user and displays on frontend
+- [x] Connection to Youtube api that pulls videos of achievements and displays on frontend
 
 ### Nov 15
 

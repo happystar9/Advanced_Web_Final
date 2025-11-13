@@ -18,6 +18,9 @@ spec:
         image: happystar91/advanced-web-final-kubernetes:${BUILD_NUMBER}
         ports:
         - containerPort: 80
+        envFrom:
+        - secretRef:
+            name: app-secrets
         env:
         - name: DB_CONN
           value: "host=ricardo-db-svc;password=mypassword;username=ricardo;database=ricardodb"
