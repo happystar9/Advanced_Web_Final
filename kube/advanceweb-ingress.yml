@@ -3,27 +3,14 @@ kind: Ingress
 metadata:
   name: ricardo-advanceweb-ingress
   namespace: ricardo-advancedweb
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      if ($request_uri ~ ^/home(/|$)(.*)) {
-        rewrite ^/home(/|$)(.*) /$2 break;
-      }
 spec:
   ingressClassName: nginx
   rules:
   - host: advanceweb.duckdns.org
     http:
       paths:
-      - path: /
+      - path: /home
         pathType: Prefix
-        backend:
-          service:
-            name: web-svc
-            port:
-              number: 80
-      - path: /home(/|$)(.*)
-        pathType: ImplementationSpecific
         backend:
           service:
             name: web-svc
