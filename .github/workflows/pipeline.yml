@@ -2,40 +2,44 @@ name: pipeline
 
 on:
   push:
-  workflow_dispatch:
+    pull_request:
+    workflow_dispatch:
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install linter
+        run: python -m pip install flake8
+
+      - name: Run flake8
+        run: flake8 . --max-line-length=150
+
   test:
     name: Run tests (container)
+    needs: lint
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
-      - name: Create .env files from GitHub Secrets
-        run: |
-          mkdir -p Library-Manager/server
-          cat > Library-Manager/server/.env <<'EOF'
-          STEAM_API_KEY=${{ secrets.STEAM_API_KEY }}
-          STEAM_OWNER_STEAMID=${{ secrets.STEAM_OWNER_STEAMID }}
-          STEAM_OWNER_VANITY=${{ secrets.STEAM_OWNER_VANITY }}
-          STEAM_HIDDEN_APPIDS=${{ secrets.STEAM_HIDDEN_APPIDS }}
-          PORT=3001
-          EOF
-
-          cat > .env <<'EOF'
-          YT_API_KEY=${{ secrets.YT_API_KEY }}
-          VITE_STEAM_PROXY_URL=http://localhost:3001
-          EOF
-        shell: bash
-
       - name: Build test image
         run: |
           docker build -f ./Library-Manager/test.Dockerfile -t ricardo_test_container ./Library-Manager
-
       - name: Run tests inside container
         run: |
           docker run --rm ricardo_test_container
-
   build_and_deploy:
     name: Build, push image and deploy (needs tests)
     needs: test
@@ -53,22 +57,11 @@ jobs:
         run: |
           docker build -t happystar91/advanced-web-final-kubernetes:${{github.run_number}} ./Library-Manager
           docker push happystar91/advanced-web-final-kubernetes:${{github.run_number}}
-
       - name: deploy to kubernetes
+        env:
+          BUILD_NUMBER: ${{ github.run_number }}
         run: |
           export KUBECONFIG=$HOME/.kube/config
-          export BUILD_NUMBER=${{github.run_number}}
-
-          kubectl create namespace ricardo-advancedweb || true
-
-          kubectl create secret generic app-secrets \
-            --from-literal=STEAM_API_KEY="${{ secrets.STEAM_API_KEY }}" \
-            --from-literal=STEAM_OWNER_STEAMID="${{ secrets.STEAM_OWNER_STEAMID }}" \
-            --from-literal=STEAM_OWNER_VANITY="${{ secrets.STEAM_OWNER_VANITY }}" \
-            --from-literal=STEAM_HIDDEN_APPIDS="${{ secrets.STEAM_HIDDEN_APPIDS }}" \
-            --from-literal=YT_API_KEY="${{ secrets.YT_API_KEY }}" \
-            --dry-run=client -o yaml | kubectl -n ricardo-advancedweb apply -f -
-
           for FILE in "kube"/*
           do
             cat "$FILE" | envsubst | kubectl apply -f -
