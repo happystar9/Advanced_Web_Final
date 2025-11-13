@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ricardo-server
+  namespace: ricardo-advancedweb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ricardo-server
+  template:
+    metadata:
+      labels:
+        app: ricardo-server
+    spec:
+      containers:
+        - name: server
+          image: happystar91/advanced-web-final-kubernetes:${BUILD_NUMBER}
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - secretRef:
+                name: app-secrets
