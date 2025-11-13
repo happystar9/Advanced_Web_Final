@@ -10,6 +10,13 @@ spec:
     - host: advanceweb.duckdns.org
       http:
         paths:
+        - path: /api
+          pathType: Prefix
+          backend:
+            service:
+              name: server-svc
+              port:
+                number: 3001
         - path: /
           pathType: Prefix
           backend:
