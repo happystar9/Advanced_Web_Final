@@ -3,6 +3,9 @@ kind: Ingress
 metadata:
   name: ricardo-advanceweb-ingress
   namespace: ricardo-advancedweb
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
@@ -11,6 +14,13 @@ spec:
       paths:
       - path: /
         pathType: Prefix
+        backend:
+          service:
+            name: web-svc
+            port:
+              number: 80
+      - path: /home(/|$)(.*)
+        pathType: ImplementationSpecific
         backend:
           service:
             name: web-svc
