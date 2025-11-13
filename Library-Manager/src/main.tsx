@@ -15,8 +15,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 const oidcConfig = {
   authority: 'https://auth-dev.snowse.io/realms/DevRealm',
   client_id: 'Ricardo-Final',
-  redirect_uri: 'http://localhost:5173/Home',
-  post_redirect_uri: 'http://localhost:5173/Home',
+  redirect_uri: 'http://localhost:5173/',
+  post_redirect_uri: 'http://localhost:5173/',
 }
 
 const queryClient = new QueryClient()
@@ -27,7 +27,7 @@ createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <Routes>
-            <Route index path="/Home" element={<Home />} />
+            <Route index path="/" element={<Home />} />
             <Route path="/settings" element={<SettingsPage />} />
               <Route
                 path="/saved-videos"

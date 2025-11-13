@@ -12,7 +12,7 @@ function NavBar() {
         <div className='navbar-header'>
             <div className='navbar-container'>
                 <nav className="navbar-nav">
-                    <Link to="/Home" style={{ marginRight: 8 }}>
+                    <Link to="/" style={{ marginRight: 8 }}>
                         Home
                     </Link>
                     {auth.isAuthenticated ? (
