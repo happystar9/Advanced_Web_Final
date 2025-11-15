@@ -106,6 +106,59 @@ app.get('/api/steam/owned/:steamid', async (req, res) => {
   }
 })
 
+// Get game schema (achievements + stats metadata)
+app.get('/api/steam/schema/:appid', async (req, res) => {
+  const { appid } = req.params
+  if (!KEY) return res.status(500).json({ error: 'STEAM_API_KEY not configured' })
+  if (!appid) return res.status(400).json({ error: 'appid required' })
+  try {
+    const url = `https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key=${KEY}&appid=${encodeURIComponent(
+      appid,
+    )}`
+    const r = await fetch(url)
+    const json = await r.json()
+    res.json(json)
+  } catch (err) {
+    res.status(500).json({ error: String(err) })
+  }
+})
+
+// Get player achievements for an app. Provide ?steamid= or the server will fall back to STEAM_OWNER_STEAMID / cached owner.
+app.get('/api/steam/playerachievements/:appid', async (req, res) => {
+  try {
+    const { appid } = req.params
+    if (!appid) return res.status(400).json({ error: 'appid required' })
+    const qSteamid = req.query.steamid
+    const steamid = qSteamid || process.env.STEAM_OWNER_STEAMID || cachedOwnerSteamId
+    if (!steamid) return res.status(400).json({ error: 'steamid query or STEAM_OWNER_STEAMID required' })
+    if (!KEY) return res.status(500).json({ error: 'STEAM_API_KEY not configured' })
+
+    const url = `https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v1/?key=${KEY}&appid=${encodeURIComponent(
+      appid,
+    )}&steamid=${encodeURIComponent(String(steamid))}`
+    const r = await fetch(url)
+    const json = await r.json()
+
+    // If Steam indicates the profile or stats are not available, include helpful debug info
+    if (json && json.playerstats && json.playerstats.success === false) {
+      console.warn('Steam GetPlayerAchievements returned failure:', json.playerstats)
+      // Echo helpful context to the caller to aid debugging
+      return res.status(200).json({
+        playerstats: json.playerstats,
+        debug: {
+          requestedSteamId: String(steamid),
+          requestedAppId: String(appid),
+          steamApiUrl: url,
+        },
+      })
+    }
+
+    res.json(json)
+  } catch (err) {
+    res.status(500).json({ error: String(err) })
+  }
+})
+
 let cachedOwnerSteamId = null
 app.get('/api/steam/me', async (req, res) => {
   try {
@@ -171,7 +224,8 @@ app.get('/api/youtube/search', async (req, res) => {
     const max = Number(req.query.maxResults || req.query.max || 10) || 10
     const key = process.env.YT_API_KEY
     if (!key) return res.status(500).json({ error: 'YT_API_KEY not configured on server' })
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=${encodeURIComponent(
+    // Exclude Shorts by requesting medium-duration videos (4-20 minutes)
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoDuration=medium&maxResults=${encodeURIComponent(
       String(max),
     )}&q=${encodeURIComponent(q)}&key=${encodeURIComponent(key)}`
     const r = await fetch(url)

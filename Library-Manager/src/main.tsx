@@ -6,7 +6,9 @@ import Home from './Pages/HomePage'
 import SettingsPage from './Pages/SettingsPage'
 import GamesListPage from './Pages/GamesListPage'
 import SavedVideos from './Pages/SavedVideosPage'
+import YouTubeResultsPage from './Pages/YouTubeResultsPage'
 import Todo from './Pages/TodoPage'
+import GameDetailsPage from './Pages/GameDetailsPage'
 import ProtectedRoute from './ProtectedRoute'
 import './index.css'
 
@@ -17,7 +19,6 @@ const oidcConfig = {
   client_id: 'Ricardo-Final',
   redirect_uri: window.location.origin + '/',
   post_redirect_uri: window.location.origin + '/',
-
 }
 
 const queryClient = new QueryClient()
@@ -43,6 +44,22 @@ createRoot(document.getElementById('root')!).render(
                 element={
                   <ProtectedRoute>
                     <Todo />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/games/:appid"
+                element={
+                  <ProtectedRoute>
+                    <GameDetailsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/youtube"
+                element={
+                  <ProtectedRoute>
+                    <YouTubeResultsPage />
                   </ProtectedRoute>
                 }
               />

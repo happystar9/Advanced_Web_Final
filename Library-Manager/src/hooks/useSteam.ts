@@ -54,3 +54,20 @@ export async function fetchOwnerSteamId(): Promise<string> {
   }
   return json['steamid']
 }
+
+export async function fetchGameSchema(appid: string): Promise<Record<string, unknown>> {
+  const base = API_BASE || ''
+  const url = `${base}/api/steam/schema/${encodeURIComponent(appid)}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Steam API proxy error: ${res.status}`)
+  return res.json()
+}
+
+export async function fetchPlayerAchievements(appid: string, steamid?: string): Promise<Record<string, unknown>> {
+  const base = API_BASE || ''
+  const q = steamid ? `?steamid=${encodeURIComponent(steamid)}` : ''
+  const url = `${base}/api/steam/playerachievements/${encodeURIComponent(appid)}${q}`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`Steam API proxy error: ${res.status}`)
+  return res.json()
+}

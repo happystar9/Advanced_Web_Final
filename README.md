@@ -197,31 +197,33 @@ Features:
 #### Estimates:
 
 Rubric items:
-- [ ] d
-- item 2 with description
+- [x] Pages/Views
 
 Features:
-- feature 4 with description
-- feature 5 with description
+- [x] Get user acheivements and display. Own Page
+- [x] Can click achievements and search using youtube api for how to get the achievements. Own Page
+
 
 #### Delivered
 
-Rubric Items:
-
+Rubric items:
+- [x] Pages/Views
 
 Features:
+- [x] Get user acheivements and display. Own Page
+- [x] Can click achievements and search using youtube api for how to get the achievements. Own Page
 
 ### Nov 19
 
 #### Estimates:
 
 Rubric items:
-- item 1 with description
-- item 2 with description
+- [] 1 Agent ability
+- [] Pages/Views 
 
 Features:
-- feature 4 with description
-- feature 5 with description
+- Agent can select 3 most relevant videos from Youtube API response to display to user.
+- Implement settings Page. Polish other pages.
 
 #### Delivered
 

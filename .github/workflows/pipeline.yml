@@ -26,6 +26,29 @@ jobs:
 
       - name: Run flake8
         run: flake8 . --max-line-length=150
+    
+    react-lint:
+    name: React Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # or 20
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install client dependencies
+        working-directory: Incrementum.client
+        run: pnpm install --frozen-lockfile
+
+      - name: Run ESLint
+        working-directory: Incrementum.client
+        run: pnpm run lint
 
   test:
     name: Run tests (container)
@@ -40,6 +63,7 @@ jobs:
       - name: Run tests inside container
         run: |
           docker run --rm ricardo_test_container
+
   build_and_deploy:
     name: Build, push image and deploy (needs tests)
     needs: test

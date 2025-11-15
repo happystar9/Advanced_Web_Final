@@ -11,7 +11,8 @@ try:
     from dotenv import load_dotenv
     load_dotenv()
 except Exception:
-    # python-dotenv is optional; if not installed the env var must be set externally
+    # python-dotenv is optional
+    # if not installed the env var must be set externally
     pass
 
 
@@ -20,10 +21,6 @@ def build_video_url(video_id: str) -> str:
 
 
 def search_youtube(query: str, api_key: str, max_results: int = 10) -> List[dict]:
-    """Call YouTube Data API v3 search.list and return list of items.
-
-    Each returned dict contains at least: videoId, title, channelTitle
-    """
     if max_results <= 0:
         return []
     # The API caps maxResults at 50 per request.
@@ -54,18 +51,43 @@ def search_youtube(query: str, api_key: str, max_results: int = 10) -> List[dict
 
 
 def main(argv):
-    parser = argparse.ArgumentParser(description="Get YouTube search result links (GetVideoResults)")
-    parser.add_argument("query", nargs="*", help="Search query (defaults to 'Light Up Your Life Little Nightmares')")
-    parser.add_argument("-n", "--max", type=int, default=10, help="Maximum number of results to return (default: 10)")
-    parser.add_argument("--open", action="store_true", dest="open", help="Open the first result in default browser")
-    parser.add_argument("--api-key", help="YouTube Data API key. If omitted, reads YT_API_KEY env var.")
+    parser = argparse.ArgumentParser(
+        description=(
+            "Get YouTube search result links (GetVideoResults)"
+        ),
+    )
+    parser.add_argument(
+        "query",
+        nargs="*",
+        help=(
+            "Search query (defaults to 'Light Up Your Life Little Nightmares')"
+        ),
+    )
+    parser.add_argument(
+        "-n", "--max", type=int, default=10,
+        help="Maximum number of results to return (default: 10)",
+    )
+    parser.add_argument(
+        "--open", action="store_true", dest="open",
+        help="Open the first result in default browser",
+    )
+    parser.add_argument(
+        "--api-key",
+        help="YouTube Data API key. If omitted, reads YT_API_KEY env var.",
+    )
     ns = parser.parse_args(argv)
 
     query = " ".join(ns.query) if ns.query else "Light Up Your Life Little Nightmares"
     api_key = ns.api_key or os.environ.get("YT_API_KEY")
     if not api_key:
-        print("ERROR: You must provide a YouTube API key via --api-key or the YT_API_KEY environment variable.")
-        print("See https://console.cloud.google.com/apis/credentials to create/restrict an API key.")
+        print(
+            "ERROR: You must provide a YouTube API key via --api-key "
+            "or the YT_API_KEY environment variable."
+        )
+        print(
+            "See https://console.cloud.google.com/apis/credentials "
+            "to create/restrict an API key."
+        )
         return 2
 
     try:
