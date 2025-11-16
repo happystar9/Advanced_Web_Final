@@ -77,13 +77,16 @@ function NavBar() {
                             <a
                                 href="#"
                                 className="ml-2 sm:ml-4"
-                                onClick={(e) => {
-                                    e.preventDefault()
-                                    const env = (typeof import.meta !== 'undefined' ? (import.meta as unknown as { env?: Record<string, string> }) : undefined)
-                                    const proxyBase = (env?.env?.VITE_STEAM_PROXY_URL) || 'http://localhost:3001'
-                                    const loginUrl = `${proxyBase.replace(/\/$/, '')}/auth/steam/login?origin=${encodeURIComponent(window.location.origin)}`
-                                    window.open(loginUrl, 'steam_login', 'width=600,height=700')
-                                }}
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        const env = (typeof import.meta !== 'undefined' ? (import.meta as unknown as { env?: Record<string, string> }) : undefined)
+                                        const envBase = env?.env?.VITE_STEAM_PROXY_URL ? String(env.env.VITE_STEAM_PROXY_URL).replace(/\/$/, '') : ''
+                                        const hostOrigin = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.origin : ''
+                                        const isProdHost = hostOrigin && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+                                        const proxyBase = envBase || (isProdHost ? hostOrigin : 'http://localhost:3001')
+                                        const loginUrl = `${proxyBase}/auth/steam/login?origin=${encodeURIComponent(window.location.origin)}`
+                                        window.open(loginUrl, 'steam_login', 'width=600,height=700')
+                                    }}
                             >
                                 Sign In with Steam
                             </a>
