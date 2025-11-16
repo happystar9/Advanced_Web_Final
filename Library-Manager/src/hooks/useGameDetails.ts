@@ -6,11 +6,17 @@ import type { GameSchema, PlayerStatsResponse, ComputedAchievement } from '../ty
 
 export default function useGameDetails(appid?: string) {
   const auth = useAuth()
+  let hasSteamToken = false
+  try {
+    hasSteamToken = !!localStorage.getItem('steam_token')
+  } catch {
+    hasSteamToken = false
+  }
 
   const ownerQuery = useQuery({
     queryKey: ['ownerSteamId'],
     queryFn: () => fetchOwnerSteamId(),
-    enabled: !!auth?.isAuthenticated,
+    enabled: !!auth?.isAuthenticated || hasSteamToken,
   })
 
   const schemaQuery = useQuery({

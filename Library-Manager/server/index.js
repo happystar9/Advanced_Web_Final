@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
 import fetch from 'node-fetch'
+import jwt from 'jsonwebtoken'
 
 const app = express()
 app.use(cors())
@@ -26,6 +27,7 @@ function steam2To64(steam2) {
 
 const PORT = process.env.PORT || 3001
 const KEY = process.env.STEAM_API_KEY
+const JWT_SECRET = process.env.STEAM_JWT_SECRET || 'dev_steam_jwt_secret'
 
 if (!KEY) {
   console.warn('Warning: STEAM_API_KEY is not set. Requests will fail until you set it.')
@@ -220,5 +222,104 @@ app.get('/api/youtube/search', async (req, res) => {
     res.json({ items })
   } catch (err) {
     res.status(500).json({ error: String(err) })
+  }
+})
+
+// --- Steam OpenID linking endpoints ---
+// Redirect user to Steam OpenID login
+app.get('/auth/steam/login', (req, res) => {
+  // preserve optional origin so the return handler can postMessage to the right window
+  const originParam = req.query.origin ? `?origin=${encodeURIComponent(String(req.query.origin))}` : ''
+  const returnTo = req.query.returnTo || `${req.protocol}://${req.get('host')}/auth/steam/return${originParam}`
+  const params = new URLSearchParams({
+    'openid.ns': 'http://specs.openid.net/auth/2.0',
+    'openid.mode': 'checkid_setup',
+    'openid.return_to': String(returnTo),
+    'openid.realm': `${req.protocol}://${req.get('host')}`,
+    'openid.identity': 'http://specs.openid.net/auth/2.0/identifier_select',
+    'openid.claimed_id': 'http://specs.openid.net/auth/2.0/identifier_select',
+  })
+  const redirectUrl = `https://steamcommunity.com/openid/login?${params.toString()}`
+  return res.redirect(redirectUrl)
+})
+
+// Handle the return from Steam OpenID and verify the assertion
+app.get('/auth/steam/return', async (req, res) => {
+  try {
+    // Build verification payload from the incoming query params
+    const incoming = req.query || {}
+    const verifyParams = new URLSearchParams()
+    Object.entries(incoming).forEach(([k, v]) => {
+      // only include openid.* params
+      verifyParams.append(k, String(v))
+    })
+    verifyParams.set('openid.mode', 'check_authentication')
+
+    const verifyRes = await fetch('https://steamcommunity.com/openid/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: verifyParams.toString(),
+    })
+    const verifyText = await verifyRes.text()
+    const isValid = /is_valid\s*:\s*true/.test(verifyText)
+
+    if (!isValid) {
+      return res.status(400).send('<h1>Steam login failed</h1><p>Unable to verify OpenID response.</p>')
+    }
+
+    const claimed = String(req.query['openid.claimed_id'] || '')
+    // claimed id typically ends with /profiles/<steamid> or /id/<vanity>
+    const m = claimed.match(/\/(profiles|id)\/(.+)$/)
+    let steamid = null
+    if (m) {
+      // If it's a numeric profile id, use it directly; if vanity, attempt resolve
+      const tail = m[2]
+      if (/^\d+$/.test(tail)) {
+        steamid = tail
+      } else {
+        // resolve vanity
+        if (!KEY) return res.status(500).send('<p>Server STEAM_API_KEY not configured for vanity resolution</p>')
+        const rv = await fetch(
+          `https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key=${KEY}&vanityurl=${encodeURIComponent(
+            tail,
+          )}`,
+        )
+        const rvj = await rv.json()
+        steamid = rvj?.response?.steamid || null
+      }
+    }
+
+    if (!steamid) return res.status(400).send('<h1>Could not extract SteamID</h1>')
+
+    // Return a tiny page that posts the steamid back to the opener window and closes
+    const origin = req.query.origin || ''
+    const safeOrigin = origin || `${req.protocol}://${req.get('host')}`
+    const token = jwt.sign({ steamid: steamid }, JWT_SECRET, { expiresIn: '7d' })
+
+    const html = `
+      <!doctype html>
+      <html>
+        <head><meta charset="utf-8"><title>Steam Link</title></head>
+        <body>
+          <script>
+            try {
+              if (window.opener) {
+                window.opener.postMessage({ type: 'steam-linked', steamid: '${steamid}', steam_token: '${token}' }, '${safeOrigin}')
+                window.close()
+              } else {
+                document.body.innerText = 'Steam ID: ${steamid}';
+              }
+            } catch (e) {
+              document.body.innerText = 'Steam ID: ${steamid}';
+            }
+          </script>
+        </body>
+      </html>
+    `
+    res.setHeader('Content-Type', 'text/html')
+    res.send(html)
+  } catch (err) {
+    console.error('Error in /auth/steam/return', err)
+    res.status(500).send('<h1>Server error</h1>')
   }
 })

@@ -10,8 +10,15 @@ type Props = {
 export default function ProtectedRoute({ children }: Props) {
   const auth = useAuth()
   const location = useLocation()
+  // Accept either OIDC authentication OR a valid steam_token stored locally
+  let hasSteamToken = false
+  try {
+    hasSteamToken = !!localStorage.getItem('steam_token')
+  } catch {
+    hasSteamToken = false
+  }
 
-  if (!auth.isAuthenticated) {
+  if (!auth.isAuthenticated && !hasSteamToken) {
     try {
       const key = `unauth_toast:${location.pathname}`
       if (!sessionStorage.getItem(key)) {

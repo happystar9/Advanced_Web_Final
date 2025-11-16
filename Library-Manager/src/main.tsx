@@ -13,6 +13,7 @@ import ProtectedRoute from './ProtectedRoute'
 import './index.css'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import SteamMessageListener from './components/SteamMessageListener'
 
 const oidcConfig = {
   authority: 'https://auth-dev.snowse.io/realms/DevRealm',
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider {...oidcConfig}>
       <QueryClientProvider client={queryClient}>
+        <SteamMessageListener />
         <BrowserRouter>
           <Routes>
             <Route index path="/" element={<Home />} />

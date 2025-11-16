@@ -13,7 +13,17 @@ import FullPageLoader from '../components/FullPageLoader'
 export default function GamesListPage() {
   const auth = useAuth()
 
-  const { games, loading, error } = useOwnerGames(!!auth?.isAuthenticated)
+  // Treat either OIDC auth or a stored steam_token as an authenticated state
+  let hasSteamToken = false
+  try {
+    hasSteamToken = !!localStorage.getItem('steam_token')
+  } catch {
+    hasSteamToken = false
+  }
+
+  const isAuthenticatedOrSteam = !!auth?.isAuthenticated || hasSteamToken
+
+  const { games, loading, error } = useOwnerGames(isAuthenticatedOrSteam)
 
   // UI filters / sorting
   const [sortMode, setSortMode] = useState<SortMode>('hours-desc')
@@ -29,7 +39,7 @@ export default function GamesListPage() {
       <NavBar />
       <main className="container mx-auto px-6 py-8 pt-20">
 
-        {auth?.isAuthenticated ? (
+        {isAuthenticatedOrSteam ? (
           <div>
             <h1 className="page-title mb-4">Steam Games</h1>
 

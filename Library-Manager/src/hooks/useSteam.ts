@@ -45,6 +45,16 @@ export default {
 
 export async function fetchOwnerSteamId(): Promise<string> {
   const base = API_BASE || ''
+  // Prefer a locally linked SteamID (from Settings 'Link Steam account') if available
+  try {
+    if (typeof window !== 'undefined') {
+      const local = localStorage.getItem('linkedSteamId')
+      if (local) return local
+    }
+  } catch (e) {
+    // ignore
+  }
+
   const url = `${base}/api/steam/me`
   const res = await fetch(url)
   if (!res.ok) throw new Error(`Steam API proxy error: ${res.status}`)

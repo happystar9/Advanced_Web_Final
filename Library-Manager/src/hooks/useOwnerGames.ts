@@ -12,9 +12,17 @@ export default function useOwnerGames(enabled: boolean) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [reloadIndex, setReloadIndex] = useState(0)
+  const [localLinked, setLocalLinked] = useState<boolean>(() => {
+    try {
+      return !!localStorage.getItem('linkedSteamId')
+    } catch {
+      return false
+    }
+  })
 
   useEffect(() => {
-    if (!enabled) return
+    const effectiveEnabled = enabled || localLinked
+    if (!effectiveEnabled) return
     let mounted = true
 
     async function loadOwnerGames() {
@@ -38,8 +46,16 @@ export default function useOwnerGames(enabled: boolean) {
 
     loadOwnerGames()
 
+    // also listen for steam-linked events (popup flow) to trigger reload
+    function onLinked() {
+      setLocalLinked(true)
+      setReloadIndex((s) => s + 1)
+    }
+    window.addEventListener('steam-linked', onLinked)
+
     return () => {
       mounted = false
+      window.removeEventListener('steam-linked', onLinked)
     }
   }, [enabled, reloadIndex])
 
