@@ -27,7 +27,7 @@ jobs:
       - name: Run flake8
         run: flake8 . --max-line-length=150
     
-    react-lint:
+  react-lint:
     name: React Lint
     runs-on: ubuntu-latest
     steps:
