@@ -7,11 +7,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ricardo-server
+      app: ricardo-advanceweb-server
   template:
     metadata:
       labels:
-        app: ricardo-server
+        app: ricardo-advanceweb-server
     spec:
       containers:
         - name: server
