@@ -10,22 +10,22 @@ function Home() {
 
   return (
     <div>
-      <div>
-        <NavBar />
-      </div>
-      <h1 className="text-2xl font-semibold mt-6 mb-4">
-        {isAuthenticated ? `Welcome${displayName ? `, ${displayName}` : ''}` : 'Welcome please sign in'}
-      </h1>
-      <div className="card">
-        <button
-          onClick={() => {
-            toast.error('Test error')
-          }}
-          style={{ marginLeft: 12 }}
-        >
-          Trigger error toast
-        </button>
-      </div>
+      <NavBar />
+      <main className="container mx-auto px-6 py-8 pt-20">
+        <h1 className="text-2xl font-semibold mt-6 mb-4">
+          {isAuthenticated ? `Welcome${displayName ? `, ${displayName}` : ''}` : 'Welcome please sign in'}
+        </h1>
+        <div className="card">
+          <button
+            onClick={() => {
+              toast.error('Test error')
+            }}
+            style={{ marginLeft: 12 }}
+          >
+            Trigger error toast
+          </button>
+        </div>
+      </main>
       <Toaster />
     </div>
   )

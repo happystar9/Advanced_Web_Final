@@ -2,6 +2,7 @@ import NavBar from '../components/NavBar'
 import '../styles/SavedVideos.css'
 import { useEffect, useState } from 'react'
 import { searchYouTube } from '../hooks/useYouTube'
+import FullPageLoader from '../components/FullPageLoader'
 
 type YouTubeItem = {
     videoId: string
@@ -36,15 +37,15 @@ export default function SavedVideos() {
         load()
         return () => { mounted = false }
     }, [])
+    if (loading) return <FullPageLoader message="Loading saved videos..." />
 
     return (
         <div>
             <NavBar />
-            <main className="container mx-auto px-6 py-12 max-w-6xl">
+            <main className="container mx-auto px-6 py-12 pt-20 max-w-6xl">
                 <h1 className="text-3xl md:text-4xl font-semibold mb-8 page-title">Saved Videos</h1>
 
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-                    {loading && <div className="text-gray-400">Loading videos...</div>}
                     {error && <div className="text-red-400">{error}</div>}
                     {videos.map((v) => (
                         <article key={v.videoId} className="bg-gray-800 text-white rounded-lg overflow-hidden shadow-lg flex flex-col hover:scale-[1.01] transition-transform duration-200">

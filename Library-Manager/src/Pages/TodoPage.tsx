@@ -20,7 +20,7 @@ function Todo() {
     return (
         <div>
             <NavBar />
-            <main className="container mx-auto px-6 py-12 max-w-6xl">
+            <main className="container mx-auto px-6 py-12 pt-20 max-w-6xl">
                 <h1 className="text-3xl font-semibold mb-8 page-title">Achievements</h1>
                 <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                     {PLACEHOLDER_ACHIEVEMENTS.map((ach) => (

@@ -12,7 +12,7 @@ export function useAuthActions() {
     const signOut = async () => {
         await auth.removeUser()
         sessionStorage.clear()
-        navigate('/Home')
+        navigate('/')
     }
 
     return { auth, signIn, signOut }
