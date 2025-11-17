@@ -77,10 +77,15 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: build and push to docker hub
+      - name: build and push web and server image to Docker Hub
         run: |
+          # Build and push web (static) image
           docker build -t happystar91/advanced-web-final-kubernetes:${{github.run_number}} ./Library-Manager
           docker push happystar91/advanced-web-final-kubernetes:${{github.run_number}}
+
+          # Build and push server (Node) image from the server Dockerfile
+          docker build -f Library-Manager/server/Dockerfile -t happystar91/advanced-web-server:${{github.run_number}} ./Library-Manager/server
+          docker push happystar91/advanced-web-server:${{github.run_number}}
       - name: deploy to kubernetes
         env:
           BUILD_NUMBER: ${{ github.run_number }}
