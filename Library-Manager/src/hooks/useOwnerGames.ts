@@ -57,7 +57,7 @@ export default function useOwnerGames(enabled: boolean) {
       mounted = false
       window.removeEventListener('steam-linked', onLinked)
     }
-  }, [enabled, reloadIndex])
+  }, [enabled, localLinked, reloadIndex])
 
   return {
     games,

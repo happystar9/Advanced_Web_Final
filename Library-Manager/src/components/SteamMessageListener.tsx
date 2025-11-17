@@ -7,13 +7,15 @@ export default function SteamMessageListener() {
   useEffect(() => {
     function onMessage(e: MessageEvent) {
       // allow messages from either the client origin or the configured backend proxy origin
-      let allowed = [window.location.origin]
+      const allowed = [window.location.origin]
       try {
         const env = (typeof import.meta !== 'undefined' ? (import.meta as unknown as { env?: Record<string, string> }) : undefined)
         const proxy = (env?.env?.VITE_STEAM_PROXY_URL) || 'http://localhost:3001'
         const protoHost = proxy.replace(/\/$/, '')
         allowed.push(protoHost)
-      } catch {}
+      } catch (err) {
+        console.warn('Failed to resolve steam proxy origin for message listener', err)
+      }
       try {
         if (!allowed.includes(e.origin)) return
       } catch {
@@ -37,25 +39,29 @@ export default function SteamMessageListener() {
         }
         try {
           toast.success('Signed in with Steam')
-        } catch {}
+        } catch (err) {
+          console.warn('Could not show Steam signin toast', err)
+        }
         // invalidate react-query caches so pages refresh
         try {
           qc.invalidateQueries({ queryKey: ['ownerSteamId'] })
           qc.invalidateQueries({ queryKey: ['playerAchievements'] })
           qc.invalidateQueries({ queryKey: ['ownedGames'] })
-        } catch (e) {
+        } catch {
           // ignore
         }
-        // dispatch an event so other parts of the app can react
+
         try {
           window.dispatchEvent(new Event('steam-linked'))
-        } catch {}
+        } catch (err) {
+          console.warn('Failed to dispatch steam-linked event', err)
+        }
       }
     }
 
     window.addEventListener('message', onMessage)
     return () => window.removeEventListener('message', onMessage)
-  }, [])
+  }, [qc])
 
   return null
 }

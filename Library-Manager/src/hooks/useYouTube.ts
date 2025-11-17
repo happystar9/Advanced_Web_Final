@@ -6,7 +6,7 @@ type YouTubeItem = {
   thumbnails?: Record<string, unknown>
 }
 
-const API_BASE = (typeof import.meta !== 'undefined' && (import.meta as unknown as any).env?.VITE_STEAM_PROXY_URL) || ''
+const API_BASE = (typeof import.meta !== 'undefined' && (import.meta as { env?: { VITE_STEAM_PROXY_URL?: string } }).env?.VITE_STEAM_PROXY_URL) || ''
 
 export async function searchYouTube(query: string, maxResults = 10): Promise<YouTubeItem[]> {
   const base = API_BASE || ''
