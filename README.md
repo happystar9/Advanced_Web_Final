@@ -218,12 +218,14 @@ Features:
 #### Estimates:
 
 Rubric items:
-- [] 1 Agent ability
+- [] 2 Agent ability
 - [] Pages/Views 
 
 Features:
 - Agent can select 3 most relevant videos from Youtube API response to display to user.
+- Agent can give random achievment list for specified game and auto add it to the todo list
 - Implement settings Page. Polish other pages.
+- Added steam login integration
 
 #### Delivered
 
@@ -237,12 +239,12 @@ Features:
 #### Estimates:
 
 Rubric items:
-- item 1 with description
-- item 2 with description
+- [] 1 Agent Ability
+- [] item 2 with description
 
 Features:
-- feature 4 with description
-- feature 5 with description
+- [] Agent can track time on game and turn on alarm to notify user when they reach a set time( User sets the time )
+- [] feature 5 with description
 
 #### Delivered
 
