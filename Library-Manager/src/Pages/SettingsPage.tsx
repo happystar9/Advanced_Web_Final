@@ -1,22 +1,28 @@
 import NavBar from "../components/NavBar"
 import { useEffect, useState } from 'react'
+import '../styles/SettingsPage.css'
+import SettingsLayout, { SidebarCard, SidebarItem } from '../components/SettingsLayout'
+import SettingRow from '../components/SettingRow'
+import SmallButton from '../components/SmallButton'
 
 function SettingsPage() {
   const [linkedSteam, setLinkedSteam] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'Account' | 'Notification'>('Account')
+  const [steamName, setSteamName] = useState<string | null>(null)
+  const [notificationTimer, setNotificationTimer] = useState<number>(15)
+  const [timerSaved, setTimerSaved] = useState<boolean>(false)
 
   useEffect(() => {
     const stored = localStorage.getItem('linkedSteamId')
     if (stored) setLinkedSteam(stored)
-
     function onMessage(e: MessageEvent) {
-      // Accept messages from the client origin or the backend proxy origin
       const allowed: string[] = [window.location.origin]
       try {
         const env = (typeof import.meta !== 'undefined' ? (import.meta as unknown as { env?: Record<string, string> }) : undefined)
         const proxyBase = (env?.env?.VITE_STEAM_PROXY_URL) || 'http://localhost:3001'
         allowed.push(proxyBase.replace(/\/$/, ''))
-      } catch (e) {
-        console.warn('Could not read VITE_STEAM_PROXY_URL', e)
+      } catch (err) {
+        console.warn('Could not read VITE_STEAM_PROXY_URL', err)
       }
       try {
         if (!allowed.includes(e.origin)) return
@@ -24,31 +30,25 @@ function SettingsPage() {
         return
       }
       const data = e.data || {}
-      if (data && data.type === 'steam-linked') {
-        if (data.steamid) {
-          setLinkedSteam(String(data.steamid))
-          localStorage.setItem('linkedSteamId', String(data.steamid))
+      // Expect messages from the popup in the shape: { type: 'steam_link', steamId: '7656...' }
+      try {
+        if (data && data.type === 'steam_link' && data.steamId) {
+          const id = String(data.steamId)
+          localStorage.setItem('linkedSteamId', id)
+          setLinkedSteam(id)
         }
-        if (data.steam_token) {
-          try {
-            localStorage.setItem('steam_token', String(data.steam_token))
-          } catch (e) {
-            console.warn('Could not store steam_token', e)
-          }
-        }
+      } catch (err) {
+        console.warn('Invalid message data', err)
       }
     }
 
     window.addEventListener('message', onMessage)
-    return () => window.removeEventListener('message', onMessage)
+    return () => { window.removeEventListener('message', onMessage) }
   }, [])
 
+  // Open the Steam OpenID linking popup
   function openSteamLink() {
-    const env = (typeof import.meta !== 'undefined' ? (import.meta as unknown as { env?: Record<string, string> }) : undefined)
-    const envBase = env?.env?.VITE_STEAM_PROXY_URL ? String(env.env.VITE_STEAM_PROXY_URL).replace(/\/$/, '') : ''
-    const hostOrigin = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.origin : ''
-    const isProdHost = hostOrigin && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
-    const proxyBase = envBase || (isProdHost ? hostOrigin : 'http://localhost:3001')
+    const proxyBase = getProxyBase()
     const loginUrl = `${proxyBase}/auth/steam/login?origin=${encodeURIComponent(window.location.origin)}`
     window.open(loginUrl, 'steam_link', 'width=600,height=700')
   }
@@ -58,26 +58,117 @@ function SettingsPage() {
     setLinkedSteam(null)
   }
 
+  // Helper to compute the backend proxy base (same logic as openSteamLink)
+  function getProxyBase() {
+    const env = (typeof import.meta !== 'undefined' ? (import.meta as unknown as { env?: Record<string, string> }) : undefined)
+    const envBase = env?.env?.VITE_STEAM_PROXY_URL ? String(env.env.VITE_STEAM_PROXY_URL).replace(/\/$/, '') : ''
+    const hostOrigin = (typeof window !== 'undefined' && window.location && window.location.hostname) ? window.location.origin : ''
+    const isProdHost = hostOrigin && !/^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+    return envBase || (isProdHost ? hostOrigin : 'http://localhost:3001')
+  }
+
+  // When a SteamID is linked, fetch the player's summary to get their display name
+  useEffect(() => {
+    if (!linkedSteam) {
+      setSteamName(null)
+      return
+    }
+    let mounted = true
+    async function fetchName() {
+      try {
+        const proxyBase = getProxyBase()
+        const res = await fetch(`${proxyBase}/api/steam/player/${encodeURIComponent(String(linkedSteam))}`)
+        if (!res.ok) return
+        const json = await res.json()
+        const name = json?.response?.players?.[0]?.personaname
+        if (mounted) setSteamName(name || null)
+      } catch (err) {
+        console.warn('Could not fetch steam player summary', err)
+      }
+    }
+    fetchName()
+    return () => { mounted = false }
+  }, [linkedSteam])
+
+  // Load saved notification timer from localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('notificationTimer')
+      if (raw) {
+        const n = parseInt(raw, 10)
+        if (!Number.isNaN(n)) setNotificationTimer(n)
+      }
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  function saveNotificationTimer() {
+    try {
+      const n = Number(notificationTimer) || 0
+      localStorage.setItem('notificationTimer', String(n))
+      setTimerSaved(true)
+      setTimeout(() => setTimerSaved(false), 2000)
+    } catch (err) {
+      console.warn('Could not save notification timer', err)
+    }
+  }
+
   return (
     <div>
       <NavBar />
-      <div className="container mx-auto px-6 py-8 pt-20">
-        <h2 className="text-2xl mb-4">Settings</h2>
-        <div className="mb-6">
-          <p className="mb-2">Link your Steam account so the app can show your games and achievements.</p>
-          {linkedSteam ? (
-            <div className="flex items-center gap-4">
-              <a className="text-blue-400 underline" href={`https://steamcommunity.com/profiles/${linkedSteam}`} target="_blank" rel="noreferrer">View Steam profile</a>
-              <div className="text-sm text-gray-300">Linked SteamID: {linkedSteam}</div>
-              <button className="px-3 py-1 rounded bg-red-600 text-white" onClick={unlink}>Unlink</button>
-            </div>
-          ) : (
-            <div className="flex gap-4">
-              <button className="px-3 py-1 rounded bg-blue-600 text-white" onClick={openSteamLink}>Link Steam account</button>
-              <p className="text-sm text-gray-400">or paste a profile URL into the "My games" page.</p>
+      <div className="w-full pl-6 pr-6 pt-20 settings-page-wrapper left-anchored">
+        <SettingsLayout
+          sidebar={(
+            <SidebarCard>
+              <SidebarItem active={activeTab === 'Account'} onClick={() => setActiveTab('Account')}>Account</SidebarItem>
+              <SidebarItem active={activeTab === 'Notification'} onClick={() => setActiveTab('Notification')}>Notification</SidebarItem>
+            </SidebarCard>
+          )}
+        >
+          {activeTab === 'Account' && (
+            <div>
+              <h2 className="section-header">Account Settings</h2>
+              <div className="section">
+                <SettingRow>
+                  {!linkedSteam && <p className="mb-2">Link your Steam account</p>}
+                  {linkedSteam ? (
+                    <div className="settings-actions">
+                      <div className="muted-2">{steamName ? `Signed in as ${steamName}` : 'Steam account linked'}</div>
+                      <a className="profile-link" href={`https://steamcommunity.com/profiles/${linkedSteam}`} target="_blank" rel="noreferrer">View Steam profile</a>
+                      <div>
+                        <SmallButton onClick={unlink}>Unlink</SmallButton>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="settings-actions">
+                      <p className="muted">Connect your Steam account to view games and achievements.</p>
+                      <div>
+                        <SmallButton onClick={openSteamLink}>Link Steam account</SmallButton>
+                      </div>
+                    </div>
+                  )}
+                </SettingRow>
+              </div>
             </div>
           )}
-        </div>
+
+          {activeTab === 'Notification' && (
+            <div>
+              <h2 className="section-header">Notification Settings</h2>
+              <div className="section">
+                <SettingRow label="Notification timer (minutes)">
+                  <div style={{display:'flex', alignItems:'center', gap:'0.5rem'}}>
+                    <input type="number" min={0} value={notificationTimer} onChange={(e) => setNotificationTimer(Number(e.target.value || 0))} className="control-select" />
+                    <SmallButton onClick={saveNotificationTimer}>Save</SmallButton>
+                    {timerSaved && <div className="small-note">Saved</div>}
+                  </div>
+                  <div className="small-note">This value will be used to notify the player (minutes).</div>
+                </SettingRow>
+              </div>
+            </div>
+          )}
+        </SettingsLayout>
       </div>
     </div>
   )
