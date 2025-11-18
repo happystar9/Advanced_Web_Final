@@ -4,16 +4,12 @@ type PlayerSummariesResponse = {
   }
 }
 
-// Give `import.meta` a small, local type describing the env vars we read.
-// This avoids casting to `any` and keeps the linter/typechecker happy without
-// touching global declarations.
 type ImportMetaWithViteEnv = {
   readonly env?: {
     readonly VITE_STEAM_PROXY_URL?: string
   }
 }
 
-// Vite exposes env vars via import.meta.env; keep the expression safe for typecheck
 const API_BASE = (typeof import.meta !== 'undefined' && (import.meta as unknown as ImportMetaWithViteEnv).env?.VITE_STEAM_PROXY_URL) || ''
 
 export async function fetchPlayerSummaries(steamid: string): Promise<PlayerSummariesResponse> {
@@ -54,7 +50,6 @@ export default {
 
 export async function fetchOwnerSteamId(): Promise<string> {
   const base = API_BASE || ''
-  // Prefer a locally linked SteamID (from Settings 'Link Steam account') if available
   try {
     if (typeof window !== 'undefined') {
       const local = localStorage.getItem('linkedSteamId')

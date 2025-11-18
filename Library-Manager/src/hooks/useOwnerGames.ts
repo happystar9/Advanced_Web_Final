@@ -46,7 +46,6 @@ export default function useOwnerGames(enabled: boolean) {
 
     loadOwnerGames()
 
-    // also listen for steam-linked events (popup flow) to trigger reload
     function onLinked() {
       setLocalLinked(true)
       setReloadIndex((s) => s + 1)
