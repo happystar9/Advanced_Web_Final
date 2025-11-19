@@ -42,7 +42,7 @@ export default function GameDetailsPage() {
 
         <AchievementsGrid achievements={achievements} filterMode={filterMode} onAchievementClick={(a) => {
           const achName = (a.displayName || a.name || a.apiname || '').trim()
-          const rawQuery = `${gameName} ${achName}`.trim()
+          const rawQuery = `${achName} ${gameName}`.trim()
           const q = encodeURIComponent(rawQuery)
           navigate(`/youtube?q=${q}`)
         }} />
