@@ -17,13 +17,15 @@ const API_BASE = (typeof import.meta !== 'undefined' && (import.meta as unknown 
 export async function fetchPlayerSummaries(steamid: string): Promise<PlayerSummariesResponse> {
   const base = API_BASE || ''
   const url = `${base}/api/steam/player/${encodeURIComponent(steamid)}`
-  return await apiFetch(url)
+  const res = await apiFetch(url)
+  return res as PlayerSummariesResponse
 }
 
 export async function resolveVanity(vanity: string): Promise<Record<string, unknown>> {
   const base = API_BASE || ''
   const url = `${base}/api/steam/resolve/${encodeURIComponent(vanity)}`
-  return await apiFetch(url)
+  const res = await apiFetch(url)
+  return res as Record<string, unknown>
 }
 
 export async function fetchOwnedGames(
@@ -36,7 +38,8 @@ export async function fetchOwnedGames(
   if (options?.include_played_free_games) params.set('include_played_free_games', '1')
   const q = params.toString() ? `?${params.toString()}` : ''
   const url = `${base}/api/steam/owned/${encodeURIComponent(steamid)}${q}`
-  return await apiFetch(url)
+  const res = await apiFetch(url)
+  return res as Record<string, unknown>
 }
 
 export default {
@@ -46,13 +49,9 @@ export default {
 
 export async function fetchOwnerSteamId(): Promise<string> {
   const base = API_BASE || ''
-  try {
-    if (typeof window !== 'undefined') {
-      const local = localStorage.getItem('linkedSteamId')
-      if (local) return local
-    }
-  } catch {
-    // ignore
+  if (typeof window !== 'undefined') {
+    const local = localStorage.getItem('linkedSteamId')
+    if (local) return local
   }
 
   const url = `${base}/api/steam/me`
@@ -66,12 +65,14 @@ export async function fetchOwnerSteamId(): Promise<string> {
 export async function fetchGameSchema(appid: string): Promise<Record<string, unknown>> {
   const base = API_BASE || ''
   const url = `${base}/api/steam/schema/${encodeURIComponent(appid)}`
-  return await apiFetch(url)
+  const res = await apiFetch(url)
+  return res as Record<string, unknown>
 }
 
 export async function fetchPlayerAchievements(appid: string, steamid?: string): Promise<Record<string, unknown>> {
   const base = API_BASE || ''
   const q = steamid ? `?steamid=${encodeURIComponent(steamid)}` : ''
   const url = `${base}/api/steam/playerachievements/${encodeURIComponent(appid)}${q}`
-  return await apiFetch(url)
+  const res = await apiFetch(url)
+  return res as Record<string, unknown>
 }

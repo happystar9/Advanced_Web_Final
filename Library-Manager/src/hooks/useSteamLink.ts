@@ -50,16 +50,13 @@ export default function useSteamLink(): UseSteamLinkResult {
             return
         }
         let mounted = true
-                        ; (async () => {
-                                const proxyBase = getProxyBase()
-                                try {
-                                    const json = await apiFetch(`${proxyBase}/api/steam/player/${encodeURIComponent(String(linkedSteam))}`)
-                                    const name = json?.response?.players?.[0]?.personaname
-                                    if (mounted) setSteamName(name || null)
-                                } catch (e) {
-                                    // ignore fetch errors; apiFetch already showed toast
-                                }
-                        })()
+            ; (async () => {
+                const proxyBase = getProxyBase()
+                type SteamApiResponse = { response?: { players?: Array<{ personaname?: string }> } }
+                const json = await apiFetch(`${proxyBase}/api/steam/player/${encodeURIComponent(String(linkedSteam))}`) as SteamApiResponse
+                const name = json?.response?.players?.[0]?.personaname
+                if (mounted) setSteamName(name || null)
+            })()
         return () => { mounted = false }
     }, [linkedSteam])
 

@@ -16,8 +16,8 @@ export async function searchYouTube(query: string, maxResults = 10): Promise<You
   params.set('q', query)
   params.set('maxResults', String(maxResults))
   const url = `${base}/api/youtube/search?${params.toString()}`
-  const json = await apiFetch(url)
-  return (json?.items || []) as YouTubeItem[]
+  const json = await apiFetch(url) as { items?: YouTubeItem[] } | undefined
+  return json?.items ?? []
 }
 
 export default { searchYouTube }
