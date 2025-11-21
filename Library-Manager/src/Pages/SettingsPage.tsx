@@ -1,5 +1,6 @@
 import NavBar from "../components/NavBar"
 import { useEffect, useState } from 'react'
+import { apiFetch } from '../lib/api'
 import '../styles/SettingsPage.css'
 import SettingsLayout, { SidebarCard, SidebarItem } from '../components/SettingsLayout'
 import SettingRow from '../components/SettingRow'
@@ -17,28 +18,17 @@ function SettingsPage() {
     if (stored) setLinkedSteam(stored)
     function onMessage(e: MessageEvent) {
       const allowed: string[] = [window.location.origin]
-      try {
-        const env = (typeof import.meta !== 'undefined' ? (import.meta as unknown as { env?: Record<string, string> }) : undefined)
-        const proxyBase = (env?.env?.VITE_STEAM_PROXY_URL) || 'http://localhost:3001'
-        allowed.push(proxyBase.replace(/\/$/, ''))
-      } catch (err) {
-        console.warn('Could not read VITE_STEAM_PROXY_URL', err)
-      }
-      try {
-        if (!allowed.includes(e.origin)) return
-      } catch {
-        return
-      }
+      const env = (typeof import.meta !== 'undefined' ? (import.meta as unknown as { env?: Record<string, string> }) : undefined)
+      const proxyBase = (env?.env?.VITE_STEAM_PROXY_URL) || 'http://localhost:3001'
+      allowed.push(proxyBase.replace(/\/$/, ''))
+
+      if (!allowed.includes(e.origin)) return
+
       const data = e.data || {}
-      // Expect messages from the popup in the shape: { type: 'steam_link', steamId: '7656...' }
-      try {
-        if (data && data.type === 'steam_link' && data.steamId) {
-          const id = String(data.steamId)
-          localStorage.setItem('linkedSteamId', id)
-          setLinkedSteam(id)
-        }
-      } catch (err) {
-        console.warn('Invalid message data', err)
+      if (data && data.type === 'steam_link' && data.steamId) {
+        const id = String(data.steamId)
+        localStorage.setItem('linkedSteamId', id)
+        setLinkedSteam(id)
       }
     }
 
@@ -46,7 +36,6 @@ function SettingsPage() {
     return () => { window.removeEventListener('message', onMessage) }
   }, [])
 
-  // Open the Steam OpenID linking popup
   function openSteamLink() {
     const proxyBase = getProxyBase()
     const loginUrl = `${proxyBase}/auth/steam/login?origin=${encodeURIComponent(window.location.origin)}`
@@ -58,7 +47,6 @@ function SettingsPage() {
     setLinkedSteam(null)
   }
 
-  // Helper to compute the backend proxy base (same logic as openSteamLink)
   function getProxyBase() {
     const env = (typeof import.meta !== 'undefined' ? (import.meta as unknown as { env?: Record<string, string> }) : undefined)
     const envBase = env?.env?.VITE_STEAM_PROXY_URL ? String(env.env.VITE_STEAM_PROXY_URL).replace(/\/$/, '') : ''
@@ -67,7 +55,6 @@ function SettingsPage() {
     return envBase || (isProdHost ? hostOrigin : 'http://localhost:3001')
   }
 
-  // When a SteamID is linked, fetch the player's summary to get their display name
   useEffect(() => {
     if (!linkedSteam) {
       setSteamName(null)
@@ -75,43 +62,30 @@ function SettingsPage() {
     }
     let mounted = true
     async function fetchName() {
-      try {
         const proxyBase = getProxyBase()
-        const res = await fetch(`${proxyBase}/api/steam/player/${encodeURIComponent(String(linkedSteam))}`)
-        if (!res.ok) return
-        const json = await res.json()
-        const name = json?.response?.players?.[0]?.personaname
+        const json = await apiFetch(`${proxyBase}/api/steam/player/${encodeURIComponent(String(linkedSteam))}`)
+        type PlayerApi = { response?: { players?: Array<{ personaname?: string }> } }
+        const j = json as unknown as PlayerApi
+        const name = j?.response?.players?.[0]?.personaname
         if (mounted) setSteamName(name || null)
-      } catch (err) {
-        console.warn('Could not fetch steam player summary', err)
       }
-    }
     fetchName()
     return () => { mounted = false }
   }, [linkedSteam])
 
-  // Load saved notification timer from localStorage
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('notificationTimer')
-      if (raw) {
-        const n = parseInt(raw, 10)
-        if (!Number.isNaN(n)) setNotificationTimer(n)
-      }
-    } catch {
-      // ignore
+    const raw = localStorage.getItem('notificationTimer')
+    if (raw) {
+      const n = parseInt(raw, 10)
+      if (!Number.isNaN(n)) setNotificationTimer(n)
     }
   }, [])
 
   function saveNotificationTimer() {
-    try {
-      const n = Number(notificationTimer) || 0
-      localStorage.setItem('notificationTimer', String(n))
-      setTimerSaved(true)
-      setTimeout(() => setTimerSaved(false), 2000)
-    } catch (err) {
-      console.warn('Could not save notification timer', err)
-    }
+    const n = Number(notificationTimer) || 0
+    localStorage.setItem('notificationTimer', String(n))
+    setTimerSaved(true)
+    setTimeout(() => setTimerSaved(false), 2000)
   }
 
   return (

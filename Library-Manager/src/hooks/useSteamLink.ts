@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { getProxyBase } from '../lib/getProxyBase'
+import { apiFetch } from '../lib/api'
 import storage from '../lib/storage'
 
 type UseSteamLinkResult = {
@@ -49,14 +50,16 @@ export default function useSteamLink(): UseSteamLinkResult {
             return
         }
         let mounted = true
-            ; (async () => {
-                const proxyBase = getProxyBase()
-                const res = await fetch(`${proxyBase}/api/steam/player/${encodeURIComponent(String(linkedSteam))}`)
-                if (!res.ok) return
-                const json = await res.json()
-                const name = json?.response?.players?.[0]?.personaname
-                if (mounted) setSteamName(name || null)
-            })()
+                        ; (async () => {
+                                const proxyBase = getProxyBase()
+                                try {
+                                    const json = await apiFetch(`${proxyBase}/api/steam/player/${encodeURIComponent(String(linkedSteam))}`)
+                                    const name = json?.response?.players?.[0]?.personaname
+                                    if (mounted) setSteamName(name || null)
+                                } catch (e) {
+                                    // ignore fetch errors; apiFetch already showed toast
+                                }
+                        })()
         return () => { mounted = false }
     }, [linkedSteam])
 

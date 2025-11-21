@@ -1,3 +1,5 @@
+import { apiFetch } from '../lib/api'
+
 type PlayerSummariesResponse = {
   response?: {
     players?: Array<Record<string, unknown>>
@@ -15,17 +17,13 @@ const API_BASE = (typeof import.meta !== 'undefined' && (import.meta as unknown 
 export async function fetchPlayerSummaries(steamid: string): Promise<PlayerSummariesResponse> {
   const base = API_BASE || ''
   const url = `${base}/api/steam/player/${encodeURIComponent(steamid)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Steam API proxy error: ${res.status}`)
-  return res.json()
+  return await apiFetch(url)
 }
 
 export async function resolveVanity(vanity: string): Promise<Record<string, unknown>> {
   const base = API_BASE || ''
   const url = `${base}/api/steam/resolve/${encodeURIComponent(vanity)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Steam API proxy error: ${res.status}`)
-  return res.json()
+  return await apiFetch(url)
 }
 
 export async function fetchOwnedGames(
@@ -38,9 +36,7 @@ export async function fetchOwnedGames(
   if (options?.include_played_free_games) params.set('include_played_free_games', '1')
   const q = params.toString() ? `?${params.toString()}` : ''
   const url = `${base}/api/steam/owned/${encodeURIComponent(steamid)}${q}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Steam API proxy error: ${res.status}`)
-  return res.json()
+  return await apiFetch(url)
 }
 
 export default {
@@ -60,9 +56,7 @@ export async function fetchOwnerSteamId(): Promise<string> {
   }
 
   const url = `${base}/api/steam/me`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Steam API proxy error: ${res.status}`)
-  const json = (await res.json()) as Record<string, unknown> | null
+  const json = (await apiFetch(url)) as Record<string, unknown> | null
   if (!json || typeof json['steamid'] !== 'string') {
     throw new Error('Invalid response from steam proxy: missing steamid')
   }
@@ -72,16 +66,12 @@ export async function fetchOwnerSteamId(): Promise<string> {
 export async function fetchGameSchema(appid: string): Promise<Record<string, unknown>> {
   const base = API_BASE || ''
   const url = `${base}/api/steam/schema/${encodeURIComponent(appid)}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Steam API proxy error: ${res.status}`)
-  return res.json()
+  return await apiFetch(url)
 }
 
 export async function fetchPlayerAchievements(appid: string, steamid?: string): Promise<Record<string, unknown>> {
   const base = API_BASE || ''
   const q = steamid ? `?steamid=${encodeURIComponent(steamid)}` : ''
   const url = `${base}/api/steam/playerachievements/${encodeURIComponent(appid)}${q}`
-  const res = await fetch(url)
-  if (!res.ok) throw new Error(`Steam API proxy error: ${res.status}`)
-  return res.json()
+  return await apiFetch(url)
 }

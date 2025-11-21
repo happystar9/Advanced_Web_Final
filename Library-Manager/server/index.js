@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken'
 
 const app = express()
 app.use(cors())
+app.use(express.json())
 
 // Load .env from the server directory (so running from repo root still works)
 const __filename = fileURLToPath(import.meta.url)
@@ -322,4 +323,20 @@ app.get('/auth/steam/return', async (req, res) => {
     console.error('Error in /auth/steam/return', err)
     res.status(500).send('<h1>Server error</h1>')
   }
+})
+
+// Generic error-handling middleware (should be last middleware)
+app.use((err, req, res, next) => {
+  try {
+    console.error('[server] Unhandled error:', err && err.stack ? err.stack : err)
+  } catch (e) {
+    console.error('[server] Error logging failed', e)
+  }
+  const status = (err && err.status) || 500
+  const message = (err && err.message) || 'Internal Server Error'
+  // Avoid leaking stack in production
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(status).json({ error: message })
+  }
+  return res.status(status).json({ error: message, stack: err && err.stack })
 })

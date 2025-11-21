@@ -14,6 +14,9 @@ import './index.css'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import SteamMessageListener from './components/SteamMessageListener'
+import { AppToaster } from './Toast'
+import ErrorBoundary from './components/ErrorBoundary'
+import toast from 'react-hot-toast'
 
 const oidcConfig = {
   authority: 'https://auth-dev.snowse.io/realms/DevRealm',
@@ -23,13 +26,27 @@ const oidcConfig = {
 }
 
 const queryClient = new QueryClient()
+type QueryClientSetter = {
+  setDefaultOptions: (opts: { queries?: { onError?: (err: unknown) => void } }) => void
+}
+;(queryClient as unknown as QueryClientSetter).setDefaultOptions({
+  queries: {
+    onError: (err: unknown) => {
+      const maybe = err as unknown as { message?: unknown }
+      const msg = maybe && typeof maybe.message === 'string' ? maybe.message : 'An error occurred while fetching data.'
+      toast.error(String(msg))
+    },
+  },
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider {...oidcConfig}>
       <QueryClientProvider client={queryClient}>
-        <SteamMessageListener />
-        <BrowserRouter>
+        <ErrorBoundary>
+          <AppToaster />
+          <SteamMessageListener />
+          <BrowserRouter>
           <Routes>
             <Route index path="/" element={<Home />} />
             <Route path="/settings" element={<SettingsPage />} />
@@ -75,6 +92,7 @@ createRoot(document.getElementById('root')!).render(
             />
           </Routes>
         </BrowserRouter>
+        </ErrorBoundary>
       </QueryClientProvider>
     </AuthProvider>
   </StrictMode>,
