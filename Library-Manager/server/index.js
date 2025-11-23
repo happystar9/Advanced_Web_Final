@@ -6,6 +6,8 @@ import cors from 'cors'
 import { steamOwnedHandler } from './endpoints/steamOwned.js'
 import { steamPlayerHandler } from './endpoints/steamPlayer.js'
 import { youtubeSearchHandler } from './endpoints/youtubeSearch.js'
+import { steamLoginHandler, steamReturnHandler } from './endpoints/steamAuth.js'
+import youtubeFilterHandler from './endpoints/aiFilter.js'
 import { steamResolveHandler } from './endpoints/steamResolve.js'
 import { steamSchemaHandler } from './endpoints/steamSchema.js'
 import { steamPlayerAchievementsHandler } from './endpoints/steamPlayerAchievements.js'
@@ -46,6 +48,7 @@ app.listen(PORT, () => {
 })
 
 app.get('/api/youtube/search', youtubeSearchHandler)
+app.post('/api/youtube/filter', youtubeFilterHandler)
 
 app.get('/auth/steam/login', steamLoginHandler)
 

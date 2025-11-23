@@ -218,8 +218,8 @@ Features:
 #### Estimates:
 
 Rubric items:
-- [] 2 Agent ability
-- [] Pages/Views 
+- [] 2 Agent ability( not complete)
+- [] Pages/Views (not complete)
 
 Features:
 - Agent can select 3 most relevant videos from Youtube API response to display to user.
@@ -239,19 +239,18 @@ Features:
 #### Estimates:
 
 Rubric items:
-- [] 1 Agent Ability
-- [] item 2 with description
+- [x] 1 Agent Ability
 
 Features:
-- [] Agent can track time on game and turn on alarm to notify user when they reach a set time( User sets the time )
-- [] feature 5 with description
+- [x] Agent can select 3 most relevant videos from Youtube API response to display to user.
 
 #### Delivered
 
-Rubric Items:
-
+Rubric items:
+- [x] 1 Agent Ability
 
 Features:
+- [x] Agent can select 3 most relevant videos from Youtube API response to display to user.
 
 ### Nov 25
 

@@ -19,51 +19,51 @@ export function steamLoginHandler(req, res) {
 }
 
 export async function steamReturnHandler(req, res) {
-    const incoming = req.query || {}
-    const verifyParams = new URLSearchParams()
-    Object.entries(incoming).forEach(([k, v]) => {
-      verifyParams.append(k, String(v))
-    })
-    verifyParams.set('openid.mode', 'check_authentication')
+  const incoming = req.query || {}
+  const verifyParams = new URLSearchParams()
+  Object.entries(incoming).forEach(([k, v]) => {
+    verifyParams.append(k, String(v))
+  })
+  verifyParams.set('openid.mode', 'check_authentication')
 
-    const verifyRes = await fetch('https://steamcommunity.com/openid/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: verifyParams.toString(),
-    })
-    const verifyText = await verifyRes.text()
-    const isValid = /is_valid\s*:\s*true/.test(verifyText)
+  const verifyRes = await fetch('https://steamcommunity.com/openid/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: verifyParams.toString(),
+  })
+  const verifyText = await verifyRes.text()
+  const isValid = /is_valid\s*:\s*true/.test(verifyText)
 
-    if (!isValid) {
-      return res.status(400).send('<h1>Steam login failed</h1><p>Unable to verify OpenID response.</p>')
+  if (!isValid) {
+    return res.status(400).send('<h1>Steam login failed</h1><p>Unable to verify OpenID response.</p>')
+  }
+
+  const claimed = String(req.query['openid.claimed_id'] || '')
+  const m = claimed.match(/\/(profiles|id)\/(.+)$/)
+  let steamid = null
+  if (m) {
+    const tail = m[2]
+    if (/^\d+$/.test(tail)) {
+      steamid = tail
+    } else {
+      if (!process.env.STEAM_API_KEY) return res.status(500).send('<p>Server STEAM_API_KEY not configured for vanity resolution</p>')
+      const rv = await fetch(
+        `https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key=${process.env.STEAM_API_KEY}&vanityurl=${encodeURIComponent(
+          tail,
+        )}`,
+      )
+      const rvj = await rv.json()
+      steamid = rvj?.response?.steamid || null
     }
+  }
 
-    const claimed = String(req.query['openid.claimed_id'] || '')
-    const m = claimed.match(/\/(profiles|id)\/(.+)$/)
-    let steamid = null
-    if (m) {
-      const tail = m[2]
-      if (/^\d+$/.test(tail)) {
-        steamid = tail
-      } else {
-        if (!process.env.STEAM_API_KEY) return res.status(500).send('<p>Server STEAM_API_KEY not configured for vanity resolution</p>')
-        const rv = await fetch(
-          `https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key=${process.env.STEAM_API_KEY}&vanityurl=${encodeURIComponent(
-            tail,
-          )}`,
-        )
-        const rvj = await rv.json()
-        steamid = rvj?.response?.steamid || null
-      }
-    }
+  if (!steamid) return res.status(400).send('<h1>Could not extract SteamID</h1>')
 
-    if (!steamid) return res.status(400).send('<h1>Could not extract SteamID</h1>')
+  const origin = req.query.origin || ''
+  const safeOrigin = origin || `${req.protocol}://${req.get('host')}`
+  const token = jwt.sign({ steamid: steamid }, JWT_SECRET, { expiresIn: '7d' })
 
-    const origin = req.query.origin || ''
-    const safeOrigin = origin || `${req.protocol}://${req.get('host')}`
-    const token = jwt.sign({ steamid: steamid }, JWT_SECRET, { expiresIn: '7d' })
-
-    const html = `
+  const html = `
       <!doctype html>
       <html>
         <head><meta charset="utf-8"><title>Steam Link</title></head>
@@ -83,6 +83,6 @@ export async function steamReturnHandler(req, res) {
         </body>
       </html>
     `
-    res.setHeader('Content-Type', 'text/html')
-    res.send(html)
+  res.setHeader('Content-Type', 'text/html')
+  res.send(html)
 }

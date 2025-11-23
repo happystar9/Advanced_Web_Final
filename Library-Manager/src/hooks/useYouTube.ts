@@ -1,7 +1,9 @@
 import { apiFetch } from '../lib/api'
 
 type YouTubeItem = {
-  videoId: string
+  videoId?: string
+  playlistId?: string
+  kind?: string
   title?: string
   channelTitle?: string
   description?: string
