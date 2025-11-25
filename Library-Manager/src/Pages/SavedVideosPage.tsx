@@ -26,7 +26,8 @@ export default function SavedVideos() {
                 const q = 'Elden Ring Nightreign "The Duchess Joins the Fray"'
                 const items = await searchYouTube(q, 10)
                 if (!mounted) return
-                setVideos(items.map((it) => ({ videoId: it.videoId, title: it.title, channelTitle: it.channelTitle, description: it.description })))
+                const withIds = (items || []).filter((it) => typeof it.videoId === 'string' && it.videoId.length > 0)
+                setVideos(withIds.map((it) => ({ videoId: it.videoId as string, title: it.title, channelTitle: it.channelTitle, description: it.description })))
             } catch (e: unknown) {
                 if (!mounted) return
                 setError(e instanceof Error ? e.message : String(e))
