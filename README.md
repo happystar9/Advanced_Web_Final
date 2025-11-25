@@ -257,19 +257,18 @@ Features:
 #### Estimates:
 
 Rubric items:
-- item 1 with description
-- item 2 with description
+- [x] 1 Agent Ability
 
 Features:
-- feature 4 with description
-- feature 5 with description
+- [x] Agent can give random achievment list for specified game and auto add it to the todo list
 
 #### Delivered
 
 Rubric Items:
-
+- [x] 1 Agent Ability
 
 Features:
+- [x] Agent can give random achievment list for specified game and auto add it to the todo list
 
 ### Dec 3
 
