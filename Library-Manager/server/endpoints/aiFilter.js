@@ -1,6 +1,17 @@
 import { OpenAI } from 'openai'
+import fetch from 'node-fetch'
 
 const openai = new OpenAI({ apiKey: "sk-no-key-required", baseURL: "http://ai-snow.reindeer-pinecone.ts.net:9292/v1" })
+
+function parseISODuration(iso) {
+    if (!iso || typeof iso !== 'string') return null
+    const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/)
+    if (!m) return null
+    const h = parseInt(m[1] || '0', 10)
+    const min = parseInt(m[2] || '0', 10)
+    const s = parseInt(m[3] || '0', 10)
+    return h * 3600 + min * 60 + s
+}
 
 async function youtubeFilterHandler(req, res) {
     const { query, videos } = req.body || {}
@@ -12,10 +23,39 @@ async function youtubeFilterHandler(req, res) {
         content: 'You are an assistant that ranks YouTube search results for relevance to a query. Respond with ONLY valid JSON.'
     }
 
-    const videosForAi = (videos || []).filter((v) => {
-        if (typeof v.durationSeconds === 'number') return v.durationSeconds >= 300
+    const items = (videos || []).map((v) => Object.assign({}, v))
+    const missingDurIds = items.filter((it) => !Number.isFinite(it.durationSeconds) && it.videoId).map((i) => i.videoId)
+    const key = process.env.YT_API_KEY
+    if (missingDurIds.length > 0 && key) {
+        const vidsUrl = `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${encodeURIComponent(
+            missingDurIds.join(','),
+        )}&key=${encodeURIComponent(key)}`
+        const vr = await fetch(vidsUrl)
+        const vjson = await vr.json()
+        const durationMap = new Map()
+            ; (vjson.items || []).forEach((vi) => {
+                const id = vi.id
+                const dur = parseISODuration(vi.contentDetails?.duration)
+                if (id) durationMap.set(String(id), dur)
+            })
+        items.forEach((it) => {
+            if (it.videoId && durationMap.has(String(it.videoId))) {
+                it.durationSeconds = durationMap.get(String(it.videoId))
+            }
+        })
+    }
+
+    const videosForAi = items.filter((v) => {
+        if (v.videoId || (v.type === 'video' || (v.kind && v.kind.includes('video')))) {
+            if (typeof v.durationSeconds === 'number') return v.durationSeconds >= 300
+            return false
+        }
         return true
     })
+
+    if (videosForAi.length === 0) {
+        return res.status(422).json({ error: 'No candidate videos are at least 5 minutes long' })
+    }
 
     const userContent = `Search query: "${query}"\n\nVideos (JSON array):\n${JSON.stringify(videosForAi)}\n\nImportant: ignore any videos under 5 minutes (300 seconds). Return a JSON array with either: 1) a playlist item followed by two video items (if a playlist is the best match), or 2) the 3 most relevant videos. Order items by relevance (most relevant first). Each array item must be an object with these keys: id (string), type ("playlist" or "video"), title (string), description (string), score (number between 0 and 1), reason (short explanation). Respond with ONLY valid JSON and no extra commentary.`
 
