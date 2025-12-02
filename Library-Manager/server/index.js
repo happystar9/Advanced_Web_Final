@@ -27,10 +27,14 @@ dotenv.config({ path: path.join(__dirname, '.env') })
 const PORT = process.env.PORT || 3001
 const KEY = process.env.STEAM_API_KEY
 
+console.log(`Starting server; PORT=${PORT}`)
+console.log(`STEAM_API_KEY ${KEY ? 'present' : 'MISSING'}`)
+console.log(`STEAM_OWNER_STEAMID ${process.env.STEAM_OWNER_STEAMID ? 'present' : 'MISSING'}`)
+console.log(`STEAM_OWNER_VANITY ${process.env.STEAM_OWNER_VANITY ? 'present' : 'MISSING'}`)
+console.log(`YT_API_KEY ${process.env.YT_API_KEY ? 'present' : 'MISSING'}`)
+
 if (!KEY) {
   console.warn('Warning: STEAM_API_KEY is not set. Requests will fail until you set it.')
-} else {
-  console.log('STEAM_API_KEY loaded from environment')
 }
 
 app.get('/api/steam/player/:steamid', steamPlayerHandler)
@@ -44,8 +48,8 @@ app.get('/api/steam/schema/:appid', steamSchemaHandler)
 app.get('/api/steam/playerachievements/:appid', steamPlayerAchievementsHandler)
 app.get('/api/steam/me', steamMeHandler)
 
-app.listen(PORT, () => {
-  console.log(`Steam proxy listening on http://localhost:${PORT}`)
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Steam proxy listening on http://0.0.0.0:${PORT}`)
 })
 
 app.get('/api/youtube/search', youtubeSearchHandler)
