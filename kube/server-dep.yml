@@ -18,6 +18,20 @@ spec:
           image: happystar91/advanced-web-server:${BUILD_NUMBER}
           ports:
             - containerPort: 3001
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            failureThreshold: 3
           envFrom:
             - secretRef:
                 name: app-secrets

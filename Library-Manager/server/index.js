@@ -52,6 +52,11 @@ app.get('/api/youtube/search', youtubeSearchHandler)
 app.post('/api/youtube/filter', youtubeFilterHandler)
 app.post('/api/achievements/suggest', achievementsSuggestHandler)
 
+// Health endpoint used by Kubernetes readiness/liveness probes
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true })
+})
+
 app.get('/auth/steam/login', steamLoginHandler)
 
 app.get('/auth/steam/return', steamReturnHandler)
