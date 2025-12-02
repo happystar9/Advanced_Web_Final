@@ -56,7 +56,8 @@ app.get('/auth/steam/login', steamLoginHandler)
 
 app.get('/auth/steam/return', steamReturnHandler)
 
-app.use((err, res,) => {
+app.use((err, req, res, next) => {
+  console.error('Unhandled error in express:', err)
   const status = (err && err.status) || 500
   const message = (err && err.message) || 'Internal Server Error'
   if (process.env.NODE_ENV === 'production') {

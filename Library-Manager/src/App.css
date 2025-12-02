@@ -1,3 +1,7 @@
+html, body {
+  background: hsl(260, 22%, 29%);
+}
+
 #root {
   max-width: 1280px;
   margin: 0 auto;

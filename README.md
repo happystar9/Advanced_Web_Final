@@ -288,22 +288,3 @@ Rubric Items:
 
 
 Features:
-
-### Dec 6
-
-#### Estimates:
-
-Rubric items:
-- item 1 with description
-- item 2 with description
-
-Features:
-- feature 4 with description
-- feature 5 with description
-
-#### Delivered
-
-Rubric Items:
-
-
-Features:
