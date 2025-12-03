@@ -275,16 +275,18 @@ Features:
 #### Estimates:
 
 Rubric items:
-- item 1 with description
-- item 2 with description
+- Create report for Turn in
 
 Features:
-- feature 4 with description
-- feature 5 with description
+- Report showing things specified on rubric
+- Make app look nicer
 
 #### Delivered
 
-Rubric Items:
 
+Rubric items:
+- Create report for Turn in
 
 Features:
+- Report showing things specified on rubric
+- Make app look nicer
