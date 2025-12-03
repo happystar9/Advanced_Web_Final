@@ -1,11 +1,13 @@
 import NavBar from '../components/NavBar'
 import '../styles/SavedVideos.css'
 import { useEffect, useState } from 'react'
-import { searchYouTube } from '../hooks/useYouTube'
+import { getString, setString } from '../lib/storage'
+import toast, { Toaster } from 'react-hot-toast'
 import FullPageLoader from '../components/FullPageLoader'
 
 type YouTubeItem = {
     videoId: string
+    playlistId?: string
     title?: string
     channelTitle?: string
     description?: string
@@ -18,16 +20,14 @@ export default function SavedVideos() {
 
     useEffect(() => {
         let mounted = true
-        async function load() {
+        function load() {
             setError(null)
             setLoading(true)
             try {
-                // Query specifically for the achievement name and game
-                const q = 'Elden Ring Nightreign "The Duchess Joins the Fray"'
-                const items = await searchYouTube(q, 10)
+                const raw = getString('savedVideos')
+                const list = raw ? JSON.parse(raw) as YouTubeItem[] : []
                 if (!mounted) return
-                const withIds = (items || []).filter((it) => typeof it.videoId === 'string' && it.videoId.length > 0)
-                setVideos(withIds.map((it) => ({ videoId: it.videoId as string, title: it.title, channelTitle: it.channelTitle, description: it.description })))
+                setVideos(list)
             } catch (e: unknown) {
                 if (!mounted) return
                 setError(e instanceof Error ? e.message : String(e))
@@ -43,13 +43,14 @@ export default function SavedVideos() {
     return (
         <div>
             <NavBar />
+            <Toaster />
             <main className="container mx-auto px-6 py-12 pt-20 max-w-6xl">
                 <h1 className="text-3xl md:text-4xl font-semibold mb-8 page-title">Saved Videos</h1>
 
                 <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
                     {error && <div className="text-red-400">{error}</div>}
                     {videos.map((v) => (
-                        <article key={v.videoId} className="bg-gray-800 text-white rounded-lg overflow-hidden shadow-lg flex flex-col hover:scale-[1.01] transition-transform duration-200">
+                        <article key={v.videoId || v.title} className="bg-gray-800 text-white rounded-lg overflow-hidden shadow-lg flex flex-col hover:scale-[1.01] transition-transform duration-200">
                             <div className="p-4">
                                 <h2 className="text-lg font-medium">{v.title}</h2>
                                 <p className="text-xs text-gray-400">{v.channelTitle}</p>
@@ -60,7 +61,33 @@ export default function SavedVideos() {
                                 </a>
                             </div>
                             <div className="p-4 flex justify-end">
-                                <a className="text-sm text-yellow-400 hover:underline" href={`https://www.youtube.com/watch?v=${v.videoId}`} target="_blank" rel="noreferrer">View</a>
+                                <a className="text-sm text-yellow-400 hover:underline mr-4" href={`https://www.youtube.com/watch?v=${v.videoId}`} target="_blank" rel="noreferrer">View</a>
+                                <a
+                                    href="#"
+                                    className="text-sm text-red-400 hover:underline"
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        try {
+                                            const raw = getString('savedVideos')
+                                            const list = raw ? (JSON.parse(raw) as YouTubeItem[]) : []
+                                            const filtered = list.filter((it) => {
+                                                const vid = it.videoId || ''
+                                                const pid = it.playlistId || ''
+                                                const curVid = v.videoId || ''
+                                                const curPid = v.playlistId || ''
+                                                return !(vid && vid === curVid) && !(pid && pid === curPid)
+                                            })
+                                            setString('savedVideos', JSON.stringify(filtered))
+                                            setVideos(filtered)
+                                            toast.success('Removed from Saved Videos')
+                                        } catch (err) {
+                                            console.warn('Could not remove saved video', err)
+                                            toast.error('Failed to remove')
+                                        }
+                                    }}
+                                >
+                                    Remove
+                                </a>
                             </div>
                         </article>
                     ))}

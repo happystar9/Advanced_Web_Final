@@ -5,6 +5,7 @@ import FullPageLoader from '../components/FullPageLoader'
 import useYouTubeResults from '../hooks/useYouTubeResults'
 import type { YouTubeItem } from '../hooks/useYouTubeResults'
 import YouTubeGrid from '../components/YouTubeGrid'
+import { Toaster } from 'react-hot-toast'
 
 export default function YouTubeResultsPage() {
   const [params] = useSearchParams()
@@ -53,6 +54,7 @@ export default function YouTubeResultsPage() {
   return (
     <div>
       <NavBar />
+      <Toaster />
       <main className="container mx-auto px-6 py-12 pt-20 max-w-6xl">
         <h1 className="text-3xl md:text-4xl font-semibold mb-8 page-title">YouTube Results</h1>
         <p className="text-sm text-gray-400 mb-4">Query: {q}</p>

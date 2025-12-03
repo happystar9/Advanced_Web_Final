@@ -6,7 +6,6 @@ export default function SteamMessageListener() {
   const qc = useQueryClient()
   useEffect(() => {
     function onMessage(e: MessageEvent) {
-      // allow messages from either the client origin or the configured backend proxy origin
       const allowed = [window.location.origin]
       try {
         const env = (typeof import.meta !== 'undefined' ? (import.meta as unknown as { env?: Record<string, string> }) : undefined)
@@ -16,11 +15,7 @@ export default function SteamMessageListener() {
       } catch (err) {
         console.warn('Failed to resolve steam proxy origin for message listener', err)
       }
-      try {
-        if (!allowed.includes(e.origin)) return
-      } catch {
-        return
-      }
+      if (!allowed.includes(e.origin)) return
       const data = e.data || {}
       if (data && data.type === 'steam-linked') {
         if (data.steamid) {
@@ -43,13 +38,9 @@ export default function SteamMessageListener() {
           console.warn('Could not show Steam signin toast', err)
         }
         // invalidate react-query caches so pages refresh
-        try {
-          qc.invalidateQueries({ queryKey: ['ownerSteamId'] })
-          qc.invalidateQueries({ queryKey: ['playerAchievements'] })
-          qc.invalidateQueries({ queryKey: ['ownedGames'] })
-        } catch {
-          // ignore
-        }
+        qc.invalidateQueries({ queryKey: ['ownerSteamId'] })
+        qc.invalidateQueries({ queryKey: ['playerAchievements'] })
+        qc.invalidateQueries({ queryKey: ['ownedGames'] })
 
         try {
           window.dispatchEvent(new Event('steam-linked'))

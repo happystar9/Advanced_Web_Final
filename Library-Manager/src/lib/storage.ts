@@ -1,9 +1,5 @@
 export function getString(key: string): string | null {
-    try {
-        return localStorage.getItem(key)
-    } catch {
-        return null
-    }
+    return localStorage.getItem(key)
 }
 
 export function setString(key: string, value: string) {
@@ -15,14 +11,10 @@ export function removeItem(key: string) {
 }
 
 export function getNumber(key: string, fallback = 0): number {
-    try {
-        const raw = localStorage.getItem(key)
-        if (!raw) return fallback
-        const n = parseInt(raw, 10)
-        return Number.isNaN(n) ? fallback : n
-    } catch {
-        return fallback
-    }
+    const raw = localStorage.getItem(key)
+    if (!raw) return fallback
+    const n = parseInt(raw, 10)
+    return Number.isNaN(n) ? fallback : n
 }
 
 export function setNumber(key: string, value: number) {

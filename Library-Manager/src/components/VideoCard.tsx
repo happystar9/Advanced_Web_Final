@@ -1,4 +1,6 @@
 import type { YouTubeItem } from '../hooks/useYouTubeResults'
+import toast from 'react-hot-toast'
+import { getString, setString } from '../lib/storage'
 
 type Props = {
   item: YouTubeItem
@@ -14,6 +16,27 @@ export default function VideoCard({ item, onView }: Props) {
   const thumbUrl = item.videoId
     ? `https://i.ytimg.com/vi/${item.videoId}/hqdefault.jpg`
     : (thumbnails?.high?.url || thumbnails?.medium?.url || thumbnails?.default?.url || '')
+
+  const saveItem = () => {
+    try {
+      console.log('VideoCard.saveItem', item.videoId || item.playlistId)
+      const raw = getString('savedVideos')
+      const list = raw ? (JSON.parse(raw) as YouTubeItem[]) : []
+      const exists = list.some((s) => (s.videoId && s.videoId === item.videoId) || (s.playlistId && s.playlistId === item.playlistId))
+      if (!exists) {
+        list.push({ videoId: item.videoId || '', playlistId: item.playlistId, title: item.title, channelTitle: item.channelTitle, description: item.description })
+        setString('savedVideos', JSON.stringify(list))
+        toast.success('Added to Saved Videos')
+        console.log('Saved to localStorage')
+      } else {
+        toast('Already saved')
+      }
+    } catch (err) {
+      console.warn('Could not save video', err)
+      toast.error('Failed to save')
+    }
+  }
+
   return (
     <article className="bg-gray-800 text-white rounded-lg overflow-hidden shadow-lg flex flex-col hover:scale-[1.01] transition-transform duration-200">
       <div className="p-4">
@@ -32,12 +55,23 @@ export default function VideoCard({ item, onView }: Props) {
       </div>
       <div className="p-4 flex justify-end">
         <a
-          className="text-sm text-yellow-400 hover:underline"
+          className="text-sm text-yellow-400 hover:underline mr-4"
           href={isPlaylist ? `https://www.youtube.com/playlist?list=${targetId}` : `https://www.youtube.com/watch?v=${targetId}`}
           target="_blank"
           rel="noreferrer"
         >
           View
+        </a>
+        <a
+          href="#"
+          role="button"
+          className="text-sm text-yellow-400 hover:underline"
+          onClick={(e) => {
+            e.preventDefault()
+            saveItem()
+          }}
+        >
+          Save
         </a>
       </div>
     </article>
