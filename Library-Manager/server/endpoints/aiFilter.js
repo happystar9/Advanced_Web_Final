@@ -57,13 +57,13 @@ async function youtubeFilterHandler(req, res) {
         return res.status(422).json({ error: 'No candidate videos are at least 5 minutes long' })
     }
 
-    const userContent = `Search query: "${query}"\n\nVideos (JSON array):\n${JSON.stringify(videosForAi)}\n\nImportant: ignore any videos under 5 minutes (300 seconds). Return a JSON array with either: 1) a playlist item followed by two video items (if a playlist is the best match), or 2) the 3 most relevant videos. Order items by relevance (most relevant first). Each array item must be an object with these keys: id (string), type ("playlist" or "video"), title (string), description (string), score (number between 0 and 1), reason (short explanation). Respond with ONLY valid JSON and no extra commentary.`
+    const userContent = `Search query: "${query}"\n\nVideos (JSON array):\n${JSON.stringify(videosForAi)}\n\nIMPORTANT INSTRUCTIONS:\n- Respond with ONLY a single JSON array and nothing else (no prose, no backticks).\n- Each array item must be an object with these keys: id (string), type ("playlist" or "video"), title (string), description (string, max 200 characters, NO NEWLINES), score (number between 0 and 1), reason (short 1-2 sentence explanation, NO NEWLINES).\n- Do NOT include extra fields. Escape quotes in values (use \\" for quotes).\n- Keep all field values short so the full JSON fits within the token limit.\n- Example output exactly (no extra text):\n  [{"id":"VIDEO_ID","type":"video","title":"Short title","description":"Short description up to 200 chars.","score":0.9,"reason":"One-sentence rationale."}]\n\nReturn the JSON array only. Ensure the JSON is complete and not truncated.`
 
     const response = await openai.chat.completions.create({
         model: 'gpt-oss-120b',
         messages: [system, { role: 'user', content: userContent }],
         temperature: 0.0,
-        max_tokens: 800
+        max_tokens: 1200
     })
 
     if (!response || !response.choices || !Array.isArray(response.choices) || response.choices.length === 0) {
@@ -117,6 +117,7 @@ async function youtubeFilterHandler(req, res) {
     }
 
 
+    console.log('AI raw response (truncated 1000 chars):', String(raw).slice(0, 1000))
     parsed = JSON.parse(raw)
 
     const match = raw.match(/\{[\s\S]*\}|\[[\s\S]*\]/)
