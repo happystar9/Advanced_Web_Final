@@ -24,7 +24,14 @@ export default function VideoCard({ item, onView }: Props) {
       const list = raw ? (JSON.parse(raw) as YouTubeItem[]) : []
       const exists = list.some((s) => (s.videoId && s.videoId === item.videoId) || (s.playlistId && s.playlistId === item.playlistId))
       if (!exists) {
-        list.push({ videoId: item.videoId || '', playlistId: item.playlistId, title: item.title, channelTitle: item.channelTitle, description: item.description })
+        list.push({
+          videoId: item.videoId || '',
+          playlistId: item.playlistId,
+          title: item.title,
+          channelTitle: item.channelTitle,
+          description: item.description,
+          thumbnails: item.thumbnails,
+        })
         setString('savedVideos', JSON.stringify(list))
         toast.success('Added to Saved Videos')
         console.log('Saved to localStorage')

@@ -11,6 +11,7 @@ type YouTubeItem = {
     title?: string
     channelTitle?: string
     description?: string
+    thumbnails?: { default?: { url?: string } | null; medium?: { url?: string } | null; high?: { url?: string } | null } | null
 }
 
 export default function SavedVideos() {
@@ -59,6 +60,14 @@ export default function SavedVideos() {
                                 {v.videoId ? (
                                     <a href={`https://www.youtube.com/watch?v=${v.videoId}`} target="_blank" rel="noreferrer">
                                         <img src={`https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`} alt={v.title} className="w-full h-auto" />
+                                    </a>
+                                ) : v.thumbnails ? (
+                                    <a href={`https://www.youtube.com/playlist?list=${v.playlistId}`} target="_blank" rel="noreferrer">
+                                        <img
+                                            src={v.thumbnails.high?.url || v.thumbnails.medium?.url || v.thumbnails.default?.url || ''}
+                                            alt={v.title}
+                                            className="w-full h-auto"
+                                        />
                                     </a>
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">No thumbnail available</div>
