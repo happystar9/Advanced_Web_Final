@@ -23,12 +23,17 @@ async function achievementsSuggestHandler(req, res) {
     const userContent = `Game: "${game || ''}"\n\nLocked achievements (JSON array):\n${JSON.stringify(simple)}\n\nReturn a JSON array with up to 4 items chosen from the input. Each item must be an object with keys: id, name, description (optional), score (0-1), reason (short). Return ONLY valid JSON.`
 
     let response
-    response = await openai.chat.completions.create({
-        model: 'gpt-oss-120b',
-        messages: [system, { role: 'user', content: userContent }],
-        temperature: 0.0,
-        max_tokens: 800
-    })
+    try {
+        response = await openai.chat.completions.create({
+            model: 'gpt-oss-120b',
+            messages: [system, { role: 'user', content: userContent }],
+            temperature: 0.0,
+            max_tokens: 800
+        })
+    } catch (err) {
+        console.error('AI request failed in achievementsSuggestHandler:', err)
+        return res.status(502).json({ error: 'AI request failed', message: String(err && (err.message || err)) })
+    }
 
     const raw = response?.choices?.[0]?.message?.content ?? response?.choices?.[0]?.text ?? null
     if (!raw) {

@@ -59,12 +59,18 @@ async function youtubeFilterHandler(req, res) {
 
     const userContent = `Search query: "${query}"\n\nVideos (JSON array):\n${JSON.stringify(videosForAi)}\n\nIMPORTANT INSTRUCTIONS:\n- Respond with ONLY a single JSON array and nothing else (no prose, no backticks).\n- Each array item must be an object with these keys: id (string), type ("playlist" or "video"), title (string), description (string, max 200 characters, NO NEWLINES), score (number between 0 and 1), reason (short 1-2 sentence explanation, NO NEWLINES).\n- Do NOT include extra fields. Escape quotes in values (use \\" for quotes).\n- Keep all field values short so the full JSON fits within the token limit.\n- Example output exactly (no extra text):\n  [{"id":"VIDEO_ID","type":"video","title":"Short title","description":"Short description up to 200 chars.","score":0.9,"reason":"One-sentence rationale."}]\n\nReturn the JSON array only. Ensure the JSON is complete and not truncated.`
 
-    const response = await openai.chat.completions.create({
-        model: 'gpt-oss-120b',
-        messages: [system, { role: 'user', content: userContent }],
-        temperature: 0.0,
-        max_tokens: 1200
-    })
+    let response
+    try {
+        response = await openai.chat.completions.create({
+            model: 'gpt-oss-120b',
+            messages: [system, { role: 'user', content: userContent }],
+            temperature: 0.0,
+            max_tokens: 1200
+        })
+    } catch (err) {
+        console.error('AI request failed in youtubeFilterHandler:', err)
+        return res.status(502).json({ error: 'AI request failed', message: String(err && (err.message || err)) })
+    }
 
     if (!response || !response.choices || !Array.isArray(response.choices) || response.choices.length === 0) {
         console.error('AI client returned no choices', { response })
